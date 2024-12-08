@@ -8,6 +8,7 @@ import Layout from './Layout';
 import ContactPage from './pages/contact';
 import Home from './components/home';
 import BookPage from './pages/book';
+import RegisterPage from './pages/register';
 
 export default function App() {
 
@@ -31,6 +32,10 @@ export default function App() {
     {
       path: "/login",
       element: <LoginPage />,
+    },
+    {
+      path: "/register",
+      element: <RegisterPage />,
     },
   ]);
 
