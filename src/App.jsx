@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   createBrowserRouter,
   RouterProvider,
@@ -9,8 +9,13 @@ import ContactPage from './pages/contact';
 import Home from './components/home';
 import BookPage from './pages/book';
 import RegisterPage from './pages/register';
+import { useDispatch } from 'react-redux';
+import { getAccount } from './services/api';
+import { doLoginAction } from './redux/account/accountSlice';
 
 export default function App() {
+
+  const dispatch = useDispatch();
 
   const router = createBrowserRouter([
     {
@@ -38,6 +43,17 @@ export default function App() {
       element: <RegisterPage />,
     },
   ]);
+
+  useEffect(() => {
+    const getAccountData = async () => {
+      const res = await getAccount();
+      console.log(res.data);
+      if (res && res.data) {
+        dispatch(doLoginAction(res.data));
+      }
+    }
+    getAccountData();
+  }, []);
 
   return (
     <>
