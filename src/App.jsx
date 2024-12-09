@@ -16,6 +16,7 @@ import LoadingPage from './pages/loading';
 import ErrorPage from './pages/error';
 import AdminPage from './pages/admin';
 import PrivateRoute from './pages/protected';
+import LayoutAdmin from './LayoutAdmin';
 
 export default function App() {
   const dispatch = useDispatch();
@@ -23,7 +24,7 @@ export default function App() {
 
   useEffect(() => {
     const getAccountData = async () => {
-      if (window.location.pathname === '/login')
+      if (window.location.pathname === '/login' || window.location.pathname === '/register' || window.location.pathname === '/')
         return;
       const res = await getAccount();
       if (res && res.data) {
@@ -53,7 +54,7 @@ export default function App() {
 
     {
       path: "/admin",
-      element: <Layout />,
+      element: <LayoutAdmin />,
       errorElement: <ErrorPage />,
       children: [
         {
@@ -77,7 +78,8 @@ export default function App() {
 
   return (
     <>
-      {isUserLogin === true || window.location.pathname === '/login' ?
+      {isUserLogin === true || window.location.pathname === '/login' || window.location.pathname === '/register' || window.location.pathname === '/'
+        ?
         <RouterProvider router={router} />
         :
         <LoadingPage />
