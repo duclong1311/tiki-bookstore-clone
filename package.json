@@ -19,6 +19,7 @@
     "react-redux": "8.0.5",
     "react-router": "^6.28.0",
     "react-router-dom": "^6.28.0",
+    "react-spinners": "0.13.8",
     "sass": "^1.82.0"
   },
   "devDependencies": {

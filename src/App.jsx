@@ -9,19 +9,35 @@ import ContactPage from './pages/contact';
 import Home from './components/home';
 import BookPage from './pages/book';
 import RegisterPage from './pages/register';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { getAccount } from './services/api';
 import { doLoginAction } from './redux/account/accountSlice';
+import LoadingPage from './pages/loading';
+import ErrorPage from './pages/error';
+import AdminPage from './pages/admin';
+import PrivateRoute from './pages/protected';
 
 export default function App() {
-
   const dispatch = useDispatch();
+  const isUserLogin = useSelector(state => state.account.isAuthenticated);
+
+  useEffect(() => {
+    const getAccountData = async () => {
+      if (window.location.pathname === '/login')
+        return;
+      const res = await getAccount();
+      if (res && res.data) {
+        dispatch(doLoginAction(res.data));
+      }
+    }
+    getAccountData();
+  }, []);
 
   const router = createBrowserRouter([
     {
       path: "/",
       element: <Layout />,
-      errorElement: <div>404 Not found</div>,
+      errorElement: <ErrorPage />,
       children: [
         { index: true, element: <Home /> },
         {
@@ -34,6 +50,21 @@ export default function App() {
         },
       ],
     },
+
+    {
+      path: "/admin",
+      element: <Layout />,
+      errorElement: <ErrorPage />,
+      children: [
+        {
+          index: true, element:
+            <PrivateRoute>
+              <AdminPage />
+            </PrivateRoute>,
+        },
+      ],
+    },
+
     {
       path: "/login",
       element: <LoginPage />,
@@ -44,20 +75,13 @@ export default function App() {
     },
   ]);
 
-  useEffect(() => {
-    const getAccountData = async () => {
-      const res = await getAccount();
-      console.log(res.data);
-      if (res && res.data) {
-        dispatch(doLoginAction(res.data));
-      }
-    }
-    getAccountData();
-  }, []);
-
   return (
     <>
-      <RouterProvider router={router} />
+      {isUserLogin === true || window.location.pathname === '/login' ?
+        <RouterProvider router={router} />
+        :
+        <LoadingPage />
+      }
     </>
   );
 }
