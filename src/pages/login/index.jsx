@@ -1,11 +1,26 @@
-import { Button, Checkbox, Form, Input, Divider } from 'antd';
+import { Button, Form, Input, Divider, message, notification } from 'antd';
 import { useNavigate, Link } from 'react-router-dom';
 import './index.scss';
+import { callLogin } from '../../services/api';
+import { useState } from 'react';
 
 const LoginPage = () => {
+    const [isSubmit, setIsSubmit] = useState(false);
 
-    const onFinish = (values) => {
-        console.log('Success:', values);
+    const onFinish = async (values) => {
+        const { username, password } = values;
+        setIsSubmit(true);
+        const res = await callLogin(username, password);
+        setIsSubmit(false);
+        if (res?.data?.access_token) {
+            message.success('Đăng nhập thành công');
+        } else {
+            notification.error({
+                description: res?.message,
+                message: 'Có lỗi xảy ra',
+                showProgress: true,
+            });
+        }
     };
 
     return (
@@ -24,7 +39,7 @@ const LoginPage = () => {
                                 autoComplete="off"
                             >
                                 <Form.Item
-                                    labelCol={{ span: 24 }} 
+                                    labelCol={{ span: 24 }}
                                     label="Email"
                                     name="username"
                                     rules={[{ required: true, message: 'Email không được để trống!' }]}
@@ -44,7 +59,7 @@ const LoginPage = () => {
                                 <Form.Item
                                 // wrapperCol={{ offset: 6, span: 16 }}
                                 >
-                                    <Button type="primary" htmlType="submit" loading={false}>
+                                    <Button type="primary" htmlType="submit" loading={isSubmit}>
                                         Đăng nhập
                                     </Button>
                                 </Form.Item>
