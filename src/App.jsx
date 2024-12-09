@@ -24,7 +24,7 @@ export default function App() {
 
   useEffect(() => {
     const getAccountData = async () => {
-      if (window.location.pathname === '/login' || window.location.pathname === '/register' || window.location.pathname === '/')
+      if (window.location.pathname === '/login' || window.location.pathname === '/register')
         return;
       const res = await getAccount();
       if (res && res.data) {
@@ -78,7 +78,7 @@ export default function App() {
 
   return (
     <>
-      {isLoading === false || window.location.pathname === '/login' || window.location.pathname === '/register' || window.location.pathname === '/'
+      {isLoading === false || window.location.pathname === '/login' || window.location.pathname === '/register'
         ?
         <RouterProvider router={router} />
         :

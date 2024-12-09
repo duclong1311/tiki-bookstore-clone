@@ -8,6 +8,11 @@ export const callLogin = (username, password, delay) => {
     return axios.post('/api/v1/auth/login', { username, password, delay });
 }
 
+export const callLogout = () => {
+    return axios.post('/api/v1/auth/logout');
+}
+
 export const getAccount = () => {
     return axios.get('/api/v1/auth/account');
 }
+

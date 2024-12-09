@@ -1,4 +1,4 @@
-import { Divider, Badge, Dropdown } from 'antd';
+import { Divider, Badge, Dropdown, message, notification } from 'antd';
 import { TiTick } from "react-icons/ti";
 import { FaCarSide } from "react-icons/fa";
 import { MdCurrencyExchange } from "react-icons/md";
@@ -10,42 +10,42 @@ import { SlMagnifier } from "react-icons/sl";
 import { RiAccountCircleLine } from "react-icons/ri";
 import { IoCartOutline } from "react-icons/io5";
 import './header.scss';
+import { callLogout } from '../../services/api';
+import { useNavigate } from 'react-router';
+import { useSelector } from 'react-redux';
 
 const items = [
     {
-        key: '1',
-        label: (
-            <a target="_blank" rel="noopener noreferrer" href="https://www.antgroup.com">
-                1st menu item
-            </a>
-        ),
+        key: 'account',
+        label: <label>Quản lý tài khoản</label>,
     },
     {
-        key: '2',
-        label: (
-            <a target="_blank" rel="noopener noreferrer" href="https://www.aliyun.com">
-                2nd menu item (disabled)
-            </a>
-        ),
-        disabled: true,
-    },
-    {
-        key: '3',
-        label: (
-            <a target="_blank" rel="noopener noreferrer" href="https://www.luohanacademy.com">
-                3rd menu item (disabled)
-            </a>
-        ),
-        disabled: true,
-    },
-    {
-        key: '4',
+        key: 'logout',
         danger: true,
-        label: 'a danger item',
+        label: <label>Đăng xuất</label>,
     },
 ];
 
 const Header = () => {
+    const navigate = useNavigate();
+
+    const isLogin = useSelector(state => state.account.isAuthenticated);
+    const userInfor = useSelector(state => state.account.user);
+
+    const handleLogout = async () => {
+        const res = await callLogout();
+        if (res && res?.data) {
+            message.success('Đăng xuất thành công');
+            navigate('/');
+        } else {
+            notification.error({
+                description: 'Lỗi không xác định, bạn chưa thể đăng xuất!',
+                message: 'Có lỗi xảy ra',
+                showProgress: true,
+            });
+        }
+    }
+
     return (
         <>
             <div className="header-container">
@@ -54,23 +54,22 @@ const Header = () => {
                         <IoLogoReact />
                     </div>
                     <div className="header-top__search">
-                        <SlMagnifier style={{ color: '#ccc', paddingRight: '5px' }} />
+                        <SlMagnifier style={{ color: '#ccc', paddingRight: '5px', fontSize: '24px' }} />
                         <input type="text" class="header-top__search-input" placeholder="Giá siêu rẻ" />
                         <Divider type="vertical" />
                         <button class="header-top__search-button">Tìm kiếm</button>
                     </div>
                     <div className='header-top__right'>
                         <div className="header-top__account">
-                            {/* <Dropdown
-                            menu={{
-                                items,
-                            }}
-                        >
-                            <a onClick={(e) => e.preventDefault()}>
-                                Hover me
-                            </a>
-                        </Dropdown> */}
-                            <span>Tài khoản</span>
+                            {isLogin ?
+                                <Dropdown menu={{ items }} trigger={['click']}>
+                                    <a onClick={(e) => e.preventDefault()}>
+                                        {`Xin chào, ${userInfor.fullName}`}
+                                    </a>
+                                </Dropdown>
+                                :
+                                <span>Tài khoản</span>
+                            }
                             <RiAccountCircleLine style={{ fontSize: "32px", marginLeft: '5px' }} />
                         </div>
                         <Divider type="vertical" style={{ borderLeft: '2px solid #ccc', height: '28px' }} />
@@ -81,7 +80,7 @@ const Header = () => {
                         </div>
                     </div>
                 </div>
-                
+
                 <div className="header-bottom">
                     Cam kết
                     <Divider type="vertical" style={{ borderLeft: '2px solid #ccc', height: '28px' }} />
