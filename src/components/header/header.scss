@@ -1,0 +1,96 @@
+* {
+    box-sizing: border-box;
+}
+
+.header-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .header-top {
+        display: flex;
+        align-items: center;
+        width: 80%;
+        margin: 20px 0px;
+
+        .header-top__logo {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-right: 10px;
+            font-size: 60px;
+            color: rgb(0, 126, 253);
+            margin-right: 50px;
+        }
+
+        .header-top__search {
+            display: flex;
+            align-items: center;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 5px 10px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 50%;
+            height: 40px;
+
+            .header-top__search-input {
+                flex: 1;
+                border: none;
+                outline: none;
+                font-size: 14px;
+                margin-right: 10px;
+
+                &.header-top__search-input::placeholder {
+                    color: #ccc;
+                }
+            }
+
+            .header-top__search-button {
+                background-color: transparent;
+                border: none;
+                color: #007bff;
+                font-size: 14px;
+                cursor: pointer;
+                outline: none;
+            }
+        }
+
+        .header-top__right {
+            display: flex;
+            align-items: center;
+            margin-left: auto;
+            margin-right: 50px;
+
+            .header-top__account {
+                display: flex;
+                align-items: center;
+                height: 50%;
+                gap: 10px;
+            }
+
+            .header-top__cart {
+                display: flex;
+                align-items: center;
+                float: right;
+                height: 50%;
+            }
+        }
+    }
+
+    .header-bottom {
+        display: flex;
+        width: 80%;
+        height: 30px;
+        align-items: center;
+        justify-content: space-between;
+        padding-right: 50px;
+
+        .header-bottom__commit {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+    }
+}

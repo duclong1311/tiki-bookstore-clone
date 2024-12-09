@@ -26,6 +26,19 @@ export const accountSlice = createSlice({
             state.isAuthenticated = true;
             state.user = action.payload.user;
             state.isLoading = false;
+        },
+        doLogoutAction: (state, action) => {
+            localStorage.removeItem('access_token');
+            state.isAuthenticated = false;
+            state.user = {
+                email: "",
+                phone: "",
+                fullName: "",
+                role: "",
+                avatar: "",
+                id: ""
+            }
+
         }
     },
     // The `extraReducers` field lets the slice handle actions defined elsewhere,
