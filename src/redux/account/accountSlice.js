@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
     isAuthenticated: false,
+    isLoading: true,
     user: {
         email: "",
         phone: "",
@@ -24,6 +25,7 @@ export const accountSlice = createSlice({
             // immutable state based off those changes
             state.isAuthenticated = true;
             state.user = action.payload.user;
+            state.isLoading = false;
         }
     },
     // The `extraReducers` field lets the slice handle actions defined elsewhere,

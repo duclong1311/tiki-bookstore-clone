@@ -5,7 +5,9 @@ const LoadingPage = () => {
 
     return (
         <>
-            <BeatLoader style={style}/>
+            <div style={style}>
+                <BeatLoader />
+            </div>
         </>
     )
 }

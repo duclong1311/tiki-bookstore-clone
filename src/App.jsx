@@ -20,7 +20,7 @@ import LayoutAdmin from './LayoutAdmin';
 
 export default function App() {
   const dispatch = useDispatch();
-  const isUserLogin = useSelector(state => state.account.isAuthenticated);
+  const isLoading = useSelector(state => state.account.isLoading);
 
   useEffect(() => {
     const getAccountData = async () => {
@@ -78,7 +78,7 @@ export default function App() {
 
   return (
     <>
-      {isUserLogin === true || window.location.pathname === '/login' || window.location.pathname === '/register' || window.location.pathname === '/'
+      {isLoading === false || window.location.pathname === '/login' || window.location.pathname === '/register' || window.location.pathname === '/'
         ?
         <RouterProvider router={router} />
         :
