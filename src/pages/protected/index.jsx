@@ -12,7 +12,7 @@ const PrivateRoute = (props) => {
                     {props.children}
                 </RoleBaseRoute>
                 :
-                <Navigate to="/login" />
+                <Navigate to="/login" replace />
             }
         </>
     );

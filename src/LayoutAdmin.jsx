@@ -9,7 +9,7 @@ import {
 import { Breadcrumb, Layout, Menu, theme, Dropdown, Space, message, notification } from 'antd';
 import { RiAdminLine } from "react-icons/ri";
 import './layoutAdmin.scss';
-import { Outlet, useNavigate } from 'react-router';
+import { Outlet, useNavigate } from 'react-router-dom';
 import Footer from "./components/footer";
 import { useDispatch, useSelector } from 'react-redux';
 import { callLogout } from './services/api';
@@ -25,11 +25,9 @@ function getItem(label, key, icon, children) {
 }
 
 const items = [
-    getItem('Dash Board', '1', <PieChartOutlined />),
-    getItem('Mange User', 'sub1', <UserOutlined />, [
-        getItem('Tom', '3'),
-        getItem('Bill', '4'),
-        getItem('Alex', '5'),
+    getItem('Dash Board', 'dashboard', <PieChartOutlined />),
+    getItem('Mange User', 'mange-user', <UserOutlined />, [
+        getItem('CRUD User', 'crud-user'),
     ]),
     getItem('Mange Book', 'sub2', <BookOutlined />, [
         getItem('Team 1', '6'),
@@ -100,12 +98,6 @@ const LayoutAdmin = () => {
                     }}
                 >
                     <div className='admin-header'>
-                        {/* <span>
-                            {React.createElement(collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
-                                className: 'trigger',
-                                onClick: () => setCollapsed(!collapsed),
-                            })}
-                        </span> */}
                         <Dropdown menu={{ items: itemsDropdown }} trigger={['click']} className='admin-header__account'>
                             <a onClick={(e) => e.preventDefault()}>
                                 <Space>
