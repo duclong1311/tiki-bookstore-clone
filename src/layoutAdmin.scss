@@ -1,6 +1,19 @@
 * {
     box-sizing: border-box;
-    overflow: hidden;
+}
+
+.layout-admin {
+    .admin-header {
+        display: flex;
+        height: 50px;
+        border-bottom: 1px solid #ebebeb;
+        align-items: center;
+        padding: 0 15px;
+
+        .admin-header__account {
+            margin-left: auto;
+        }
+    }
 }
 
 .demo-logo-vertical {

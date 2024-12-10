@@ -12,29 +12,20 @@ import { IoCartOutline } from "react-icons/io5";
 import './header.scss';
 import { callLogout } from '../../services/api';
 import { useNavigate } from 'react-router';
-import { useSelector } from 'react-redux';
-
-const items = [
-    {
-        key: 'account',
-        label: <label>Quản lý tài khoản</label>,
-    },
-    {
-        key: 'logout',
-        danger: true,
-        label: <label>Đăng xuất</label>,
-    },
-];
+import { useDispatch, useSelector } from 'react-redux';
+import { doLogoutAction } from '../../redux/account/accountSlice';
 
 const Header = () => {
     const navigate = useNavigate();
 
     const isLogin = useSelector(state => state.account.isAuthenticated);
     const userInfor = useSelector(state => state.account.user);
+    const dispatch = useDispatch();
 
     const handleLogout = async () => {
         const res = await callLogout();
         if (res && res?.data) {
+            dispatch(doLogoutAction());
             message.success('Đăng xuất thành công');
             navigate('/');
         } else {
@@ -45,6 +36,21 @@ const Header = () => {
             });
         }
     }
+
+    console.log(userInfor);
+
+    const items = [
+        {
+            key: 'account',
+            label: <label>Quản lý tài khoản</label>,
+        },
+        {
+            key: 'logout',
+            danger: true,
+            label: <label>Đăng xuất</label>,
+            onClick: handleLogout,
+        },
+    ];
 
     return (
         <>

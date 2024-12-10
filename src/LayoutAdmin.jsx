@@ -1,16 +1,20 @@
 import React, { useState } from 'react';
 import {
-    DesktopOutlined,
     FileOutlined,
     PieChartOutlined,
-    TeamOutlined,
+    DownOutlined,
     UserOutlined,
+    BookOutlined
 } from '@ant-design/icons';
-import { Breadcrumb, Layout, Menu, theme } from 'antd';
+import { Breadcrumb, Layout, Menu, theme, Dropdown, Space, message, notification } from 'antd';
 import { RiAdminLine } from "react-icons/ri";
 import './layoutAdmin.scss';
-import { Outlet } from 'react-router';
-const { Header, Content, Footer, Sider } = Layout;
+import { Outlet, useNavigate } from 'react-router';
+import Footer from "./components/footer";
+import { useDispatch, useSelector } from 'react-redux';
+import { callLogout } from './services/api';
+import { doLogoutAction } from './redux/account/accountSlice';
+const { Header, Content, Sider } = Layout;
 function getItem(label, key, icon, children) {
     return {
         key,
@@ -19,24 +23,64 @@ function getItem(label, key, icon, children) {
         label,
     };
 }
+
 const items = [
-    getItem('Option 1', '1', <PieChartOutlined />),
-    getItem('Option 2', '2', <DesktopOutlined />),
-    getItem('User', 'sub1', <UserOutlined />, [
+    getItem('Dash Board', '1', <PieChartOutlined />),
+    getItem('Mange User', 'sub1', <UserOutlined />, [
         getItem('Tom', '3'),
         getItem('Bill', '4'),
         getItem('Alex', '5'),
     ]),
-    getItem('Team', 'sub2', <TeamOutlined />, [getItem('Team 1', '6'), getItem('Team 2', '8')]),
-    getItem('Files', '9', <FileOutlined />),
+    getItem('Mange Book', 'sub2', <BookOutlined />, [
+        getItem('Team 1', '6'),
+        getItem('Team 2', '8'),
+    ]),
+    getItem('Mange Order', '9', <FileOutlined />),
 ];
+
+
+
 const LayoutAdmin = () => {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const userInfor = useSelector(state => state.account.user);
+
     const [collapsed, setCollapsed] = useState(false);
+
     const {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
+
+    const handleLogout = async () => {
+        const res = await callLogout();
+        if (res && res?.data) {
+            dispatch(doLogoutAction());
+            message.success('Đăng xuất thành công');
+            navigate('/login');
+        } else {
+            notification.error({
+                description: 'Lỗi không xác định, bạn chưa thể đăng xuất!',
+                message: 'Có lỗi xảy ra',
+                showProgress: true,
+            });
+        }
+    }
+
+    const itemsDropdown = [
+        {
+            label: <label>Quản lý tài khoản</label>,
+            key: 'account',
+        },
+        {
+            label: <label >Đăng xuất</label>,
+            key: 'logout',
+            onClick: handleLogout
+        },
+    ];
+
     return (
         <Layout
+            className="layout-admin"
             style={{
                 minHeight: '100vh',
             }}
@@ -48,16 +92,34 @@ const LayoutAdmin = () => {
                 </div>
                 <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" items={items} />
             </Sider>
-            <Layout>
+            <Layout >
                 <Header
                     style={{
                         padding: 0,
                         background: colorBgContainer,
                     }}
-                />
+                >
+                    <div className='admin-header'>
+                        {/* <span>
+                            {React.createElement(collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
+                                className: 'trigger',
+                                onClick: () => setCollapsed(!collapsed),
+                            })}
+                        </span> */}
+                        <Dropdown menu={{ items: itemsDropdown }} trigger={['click']} className='admin-header__account'>
+                            <a onClick={(e) => e.preventDefault()}>
+                                <Space>
+                                    Welcome {userInfor?.fullName}
+                                    <DownOutlined />
+                                </Space>
+                            </a>
+                        </Dropdown>
+                    </div>
+                </Header>
                 <Content
                     style={{
                         margin: '0 16px',
+                        overflow: "auto"
                     }}
                 >
                     <Breadcrumb
@@ -71,7 +133,7 @@ const LayoutAdmin = () => {
                     <div
                         style={{
                             padding: 24,
-                            minHeight: 360,
+                            minHeight: '86%',
                             background: colorBgContainer,
                             borderRadius: borderRadiusLG,
                         }}
