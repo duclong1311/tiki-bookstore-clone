@@ -64,7 +64,7 @@ const Header = () => {
                             {isLogin ?
                                 <Dropdown menu={{ items }} trigger={['click']}>
                                     <a onClick={(e) => e.preventDefault()}>
-                                        {`Xin chào, ${userInfor.fullName}`}
+                                        {`Xin chào, ${userInfor?.fullName}`}
                                     </a>
                                 </Dropdown>
                                 :
