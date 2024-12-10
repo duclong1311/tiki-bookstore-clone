@@ -3,14 +3,15 @@ import {
     DesktopOutlined,
     FileOutlined,
     PieChartOutlined,
-    TeamOutlined,
+    BookOutlined,
     UserOutlined,
 } from '@ant-design/icons';
 import { Breadcrumb, Layout, Menu, theme } from 'antd';
 import { RiAdminLine } from "react-icons/ri";
 import './layoutAdmin.scss';
 import { Outlet } from 'react-router';
-const { Header, Content, Footer, Sider } = Layout;
+import Footer from "./components/footer";
+const { Header, Content, Sider } = Layout;
 function getItem(label, key, icon, children) {
     return {
         key,
@@ -20,15 +21,18 @@ function getItem(label, key, icon, children) {
     };
 }
 const items = [
-    getItem('Option 1', '1', <PieChartOutlined />),
+    getItem('Dash Board', '1', <PieChartOutlined />),
     getItem('Option 2', '2', <DesktopOutlined />),
-    getItem('User', 'sub1', <UserOutlined />, [
+    getItem('Manage Users', 'sub1', <UserOutlined />, [
         getItem('Tom', '3'),
         getItem('Bill', '4'),
         getItem('Alex', '5'),
     ]),
-    getItem('Team', 'sub2', <TeamOutlined />, [getItem('Team 1', '6'), getItem('Team 2', '8')]),
-    getItem('Files', '9', <FileOutlined />),
+    getItem('Manage Book', 'sub2', <BookOutlined />, [
+        getItem('Team 1', '6'),
+        getItem('Team 2', '8')
+    ]),
+    getItem('Manage Order', '9', <FileOutlined />),
 ];
 const LayoutAdmin = () => {
     const [collapsed, setCollapsed] = useState(false);
@@ -71,7 +75,7 @@ const LayoutAdmin = () => {
                     <div
                         style={{
                             padding: 24,
-                            minHeight: 360,
+                            minHeight: '88%',
                             background: colorBgContainer,
                             borderRadius: borderRadiusLG,
                         }}
