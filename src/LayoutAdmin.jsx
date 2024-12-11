@@ -118,10 +118,11 @@ const LayoutAdmin = () => {
                         style={{
                             margin: '16px 0',
                         }}
-                    >
-                        <Breadcrumb.Item>User</Breadcrumb.Item>
-                        <Breadcrumb.Item>Bill</Breadcrumb.Item>
-                    </Breadcrumb>
+                        items={[
+                            { title: 'Home' },
+                            { title: 'About' },
+                        ]}
+                    />
                     <div
                         style={{
                             padding: 24,

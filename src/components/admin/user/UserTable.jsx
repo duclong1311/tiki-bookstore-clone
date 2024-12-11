@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Space, Tag } from 'antd';
 import { getUsersWithPaginate } from '../../../services/api';
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import InputSearch from './InputSearch';
 const data = [
     {
         _id: '',
@@ -16,20 +18,28 @@ const UserTable = () => {
     const [listUser, setListUser] = useState(data);
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
+    const [isLoading, setIsLoading] = useState(false);
 
-    useEffect(() => {
-        const fetchListUser = async () => {
-            const query = `current=${currentPage}&pageSize=${pageSize}`;
-            const res = await getUsersWithPaginate(query);
+    const fetchListUser = async (searchQuery) => {
+        setIsLoading(true);
 
-            if (res && res.data && res.data.result.length > 0) {
-                const listUserData = res.data.result;
-                const metaData = res.data.meta;
-                setListUser(listUserData);
-                setTotalData(metaData.total);
-            }
+        let query = `current=${currentPage}&pageSize=${pageSize}`;
+        if (searchQuery) {
+            query += searchQuery;
         }
 
+        const res = await getUsersWithPaginate(query);
+
+        if (res && res.data && res.data.result.length > 0) {
+            const listUserData = res.data.result;
+            const metaData = res.data.meta;
+            setListUser(listUserData);
+            setTotalData(metaData.total);
+        }
+        setIsLoading(false);
+    }
+
+    useEffect(() => {
         fetchListUser();
     }, [currentPage, pageSize]);
 
@@ -50,6 +60,10 @@ const UserTable = () => {
 
     const handleClickDelete = (userId) => {
         console.log('Delete', userId);
+    }
+
+    const searchFilter = (searchQuery) => {
+        fetchListUser(searchQuery);
     }
 
     const columns = [
@@ -94,8 +108,16 @@ const UserTable = () => {
             key: 'action',
             render: (_, record) => (
                 <Space size="middle">
-                    <a onClick={() => handleClickEdit(record._id)}>Edit</a>
-                    <a onClick={() => handleClickDelete(record._id)} style={{ color: 'red' }}>Delete</a>
+                    <a onClick={() => handleClickEdit(record._id)}>
+                        <span>
+                            <EditOutlined />
+                        </span>
+                    </a>
+                    <a onClick={() => handleClickDelete(record._id)} style={{ color: 'red' }}>
+                        <span>
+                            <DeleteOutlined />
+                        </span>
+                    </a>
                 </Space>
             ),
         },
@@ -103,11 +125,13 @@ const UserTable = () => {
 
     return (
         <>
+            <InputSearch searchFilter={searchFilter} />
             <Table
                 columns={columns}
                 dataSource={listUser}
                 onChange={onTableChange}
                 rowKey={'_id'}
+                isLoading={isLoading}
                 pagination={
                     {
                         current: currentPage,
