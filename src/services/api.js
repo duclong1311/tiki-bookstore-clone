@@ -16,3 +16,7 @@ export const getAccount = () => {
     return axios.get('/api/v1/auth/account');
 }
 
+export const getUsersWithPaginate = (query) => {
+    return axios.get(`/api/v1/user?${query}`);
+}
+
