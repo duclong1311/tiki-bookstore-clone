@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Space, Tag } from 'antd';
 import { getUsersWithPaginate } from '../../../services/api';
-import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, EyeOutlined } from '@ant-design/icons';
 import InputSearch from './InputSearch';
+import UserViewDetail from './UserViewDetail';
 const data = [
     {
         _id: '',
         fullName: '',
         email: '',
         phone: '',
-        role: ''
+        role: '',
     }
 ];
 
@@ -19,29 +20,33 @@ const UserTable = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [isLoading, setIsLoading] = useState(false);
-
-    const fetchListUser = async (searchQuery) => {
-        setIsLoading(true);
-
-        let query = `current=${currentPage}&pageSize=${pageSize}`;
-        if (searchQuery) {
-            query += searchQuery;
-        }
-
-        const res = await getUsersWithPaginate(query);
-
-        if (res && res.data && res.data.result.length > 0) {
-            const listUserData = res.data.result;
-            const metaData = res.data.meta;
-            setListUser(listUserData);
-            setTotalData(metaData.total);
-        }
-        setIsLoading(false);
-    }
+    const [searchQuery, setSearchQuery] = useState('');
+    const [openUserDetail, setOpenUserDetail] = useState(false);
+    const [dataViewDetail, setDataViewDetail] = useState([]);
 
     useEffect(() => {
+        const fetchListUser = async () => {
+            setIsLoading(true);
+
+            let query = `current=${currentPage}&pageSize=${pageSize}`;
+            if (searchQuery) {
+                query += searchQuery;
+            }
+            console.log(searchQuery);
+
+            const res = await getUsersWithPaginate(query);
+
+            if (res && res.data && res.data.result.length > 0) {
+                const listUserData = res.data.result;
+                const metaData = res.data.meta;
+                setListUser(listUserData);
+                setTotalData(metaData.total);
+            }
+            setIsLoading(false);
+        }
+
         fetchListUser();
-    }, [currentPage, pageSize]);
+    }, [currentPage, pageSize, searchQuery]);
 
     const onTableChange = (pagination, filters, sorter, extra) => {
         if (pagination && pagination.current !== currentPage) {
@@ -62,30 +67,42 @@ const UserTable = () => {
         console.log('Delete', userId);
     }
 
-    const searchFilter = (searchQuery) => {
-        fetchListUser(searchQuery);
+    const handleClickDetailUser = (record) => {
+        setOpenUserDetail(true);
+        setDataViewDetail(record);
+    }
+
+    const searchFilter = (query) => {
+        setSearchQuery(query)
     }
 
     const columns = [
         {
             title: 'Id',
             dataIndex: '_id',
+            sorter: (a, b) => a._id.length - b._id.length,
+            render: (_, record) => (
+                <a onClick={() => handleClickDetailUser(record?._id)}>{record?._id}</a>
+            ),
             width: '10%',
         },
         {
             title: 'Tên hiển thị',
             dataIndex: 'fullName',
+            sorter: (a, b) => a.fullName.length - b.fullName.length,
             width: '20%',
         },
         {
             title: 'Email',
             dataIndex: 'email',
             filterSearch: true,
+            sorter: (a, b) => a.email.length - b.email.length,
             width: '20%',
         },
         {
             title: 'Số điện thoại',
             dataIndex: 'phone',
+            sorter: (a, b) => a.phone.length - b.phone.length,
             width: '20%',
         },
         {
@@ -118,13 +135,26 @@ const UserTable = () => {
                             <DeleteOutlined />
                         </span>
                     </a>
+                    <a onClick={() => handleClickDetailUser(record)} style={{ color: 'green' }}>
+                        <span>
+                            <EyeOutlined />
+                        </span>
+                    </a>
                 </Space>
             ),
         },
     ];
 
+    console.log(dataViewDetail);
+
     return (
         <>
+            <UserViewDetail
+                openUserDetail={openUserDetail}
+                setOpenUserDetail={setOpenUserDetail}
+                setDataViewDetail={setDataViewDetail}
+                dataViewDetail={dataViewDetail}
+            />
             <InputSearch searchFilter={searchFilter} />
             <Table
                 columns={columns}
