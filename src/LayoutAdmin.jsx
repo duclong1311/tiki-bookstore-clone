@@ -6,14 +6,15 @@ import {
     UserOutlined,
     BookOutlined
 } from '@ant-design/icons';
-import { Breadcrumb, Layout, Menu, theme, Dropdown, Space, message, notification } from 'antd';
+import { Breadcrumb, Layout, Menu, theme, Dropdown, Space, message, notification, Avatar } from 'antd';
 import { RiAdminLine } from "react-icons/ri";
 import './layoutAdmin.scss';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Link, Outlet, useNavigate } from 'react-router-dom';
 import Footer from "./components/footer";
 import { useDispatch, useSelector } from 'react-redux';
 import { callLogout } from './services/api';
 import { doLogoutAction } from './redux/account/accountSlice';
+const baseUrl = import.meta.env.VITE_BACKEND_URL;
 const { Header, Content, Sider } = Layout;
 function getItem(label, key, icon, children) {
     return {
@@ -26,8 +27,8 @@ function getItem(label, key, icon, children) {
 
 const items = [
     getItem('Dash Board', 'dashboard', <PieChartOutlined />),
-    getItem('Mange User', 'mange-user', <UserOutlined />, [
-        getItem('CRUD User', 'crud-user'),
+    getItem('Mange User', 'manage-user', <UserOutlined />, [
+        getItem('CRUD User', 'user'),
     ]),
     getItem('Mange Book', 'sub2', <BookOutlined />, [
         getItem('Team 1', '6'),
@@ -44,6 +45,7 @@ const LayoutAdmin = () => {
     const userInfor = useSelector(state => state.account.user);
 
     const [collapsed, setCollapsed] = useState(false);
+    const [pageUrl, setPageUrl] = useState('/');
 
     const {
         token: { colorBgContainer, borderRadiusLG },
@@ -70,6 +72,10 @@ const LayoutAdmin = () => {
             key: 'account',
         },
         {
+            key: 'homepage',
+            label: <Link to="/" >Trang chủ</Link>,
+        },
+        {
             label: <label >Đăng xuất</label>,
             key: 'logout',
             onClick: handleLogout
@@ -88,7 +94,13 @@ const LayoutAdmin = () => {
                     <RiAdminLine style={{ fontSize: '22px' }} />
                     <div>ADMIN</div>
                 </div>
-                <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" items={items} />
+                <Menu
+                    theme="dark"
+                    defaultSelectedKeys={['dashboard']}
+                    mode="inline"
+                    items={items}
+                    onSelect={({ key }) => navigate(`/admin/${key}`)}
+                />
             </Sider>
             <Layout >
                 <Header
@@ -98,10 +110,16 @@ const LayoutAdmin = () => {
                     }}
                 >
                     <div className='admin-header'>
+
                         <Dropdown menu={{ items: itemsDropdown }} trigger={['click']} className='admin-header__account'>
                             <a onClick={(e) => e.preventDefault()}>
                                 <Space>
-                                    Welcome {userInfor?.fullName}
+                                    <Avatar
+                                        size="large"
+                                        icon={<UserOutlined />}
+                                        src={`${baseUrl}/images/avatar/${userInfor?.avatar}`}
+                                    />
+                                    {userInfor?.fullName}
                                     <DownOutlined />
                                 </Space>
                             </a>

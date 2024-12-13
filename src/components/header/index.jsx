@@ -1,4 +1,4 @@
-import { Divider, Badge, Dropdown, message, notification } from 'antd';
+import { Divider, Badge, Dropdown, message, notification, Avatar } from 'antd';
 import { TiTick } from "react-icons/ti";
 import { FaCarSide } from "react-icons/fa";
 import { MdCurrencyExchange } from "react-icons/md";
@@ -14,6 +14,9 @@ import { callLogout } from '../../services/api';
 import { useNavigate } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { doLogoutAction } from '../../redux/account/accountSlice';
+import { UserOutlined } from '@ant-design/icons';
+import { Link } from 'react-router-dom';
+const baseUrl = import.meta.env.VITE_BACKEND_URL;
 
 const Header = () => {
     const navigate = useNavigate();
@@ -39,7 +42,12 @@ const Header = () => {
 
     console.log(userInfor);
 
-    const items = [
+    let items = [
+        {
+            key: 'adminPage',
+            label: <Link to="/admin" >Trang quản trị</Link>,
+            disabled: userInfor?.role === 'USER' ? true : false,
+        },
         {
             key: 'account',
             label: <label>Quản lý tài khoản</label>,
@@ -50,6 +58,7 @@ const Header = () => {
             label: <label>Đăng xuất</label>,
             onClick: handleLogout,
         },
+
     ];
 
     return (
@@ -68,15 +77,22 @@ const Header = () => {
                     <div className='header-top__right'>
                         <div className="header-top__account">
                             {isLogin ?
-                                <Dropdown menu={{ items }} trigger={['click']}>
-                                    <a onClick={(e) => e.preventDefault()}>
-                                        {`Xin chào, ${userInfor?.fullName}`}
-                                    </a>
-                                </Dropdown>
+                                <>
+                                    <Avatar
+                                        size="large"
+                                        icon={<UserOutlined />}
+                                        src={`${baseUrl}/images/avatar/${userInfor?.avatar}`}
+                                        style={{ fontSize: "32px", marginLeft: '5px' }}
+                                    />
+                                    <Dropdown menu={{ items }} trigger={['click']}>
+                                        <a onClick={(e) => e.preventDefault()}>
+                                            {`${userInfor?.fullName}`}
+                                        </a>
+                                    </Dropdown>
+                                </>
                                 :
-                                <span>Tài khoản</span>
+                                <span><UserOutlined style={{ fontSize: "32px", marginRight: '5px' }} />Tài khoản</span>
                             }
-                            <RiAccountCircleLine style={{ fontSize: "32px", marginLeft: '5px' }} />
                         </div>
                         <Divider type="vertical" style={{ borderLeft: '2px solid #ccc', height: '28px' }} />
                         <div className="header-top__cart">

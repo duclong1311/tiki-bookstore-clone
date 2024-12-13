@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Space, Tag } from 'antd';
+import { Table, Space, Tag, Button } from 'antd';
 import { getUsersWithPaginate } from '../../../services/api';
-import { DeleteOutlined, EditOutlined, EyeOutlined } from '@ant-design/icons';
+import { DeleteOutlined, DownloadOutlined, EditOutlined, ExportOutlined, EyeOutlined, ImportOutlined, PlusOutlined, ReloadOutlined } from '@ant-design/icons';
 import InputSearch from './InputSearch';
 import UserViewDetail from './UserViewDetail';
 const data = [
@@ -74,6 +74,28 @@ const UserTable = () => {
 
     const searchFilter = (query) => {
         setSearchQuery(query)
+    }
+
+    const renderHeader = () => {
+        return (
+            <>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <div>Danh sách người dùng</div>
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                        <Button type="primary" shape="default" icon={<ImportOutlined />}>
+                            Nhập file
+                        </Button>
+                        <Button type="primary" shape="default" icon={<ExportOutlined />}>
+                            Xuất file
+                        </Button>
+                        <Button type="primary" shape="default" icon={<PlusOutlined />}>
+                            Thêm mới
+                        </Button>
+                        <Button icon={<ReloadOutlined />} />
+                    </div>
+                </div>
+            </>
+        );
     }
 
     const columns = [
@@ -157,6 +179,7 @@ const UserTable = () => {
             />
             <InputSearch searchFilter={searchFilter} />
             <Table
+                title={renderHeader}
                 columns={columns}
                 dataSource={listUser}
                 onChange={onTableChange}

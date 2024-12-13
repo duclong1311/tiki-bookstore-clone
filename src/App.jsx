@@ -67,6 +67,13 @@ export default function App() {
             </PrivateRoute>,
         },
         {
+          path: "dashboard",
+          element:
+            <PrivateRoute>
+              <AdminPage />
+            </PrivateRoute>,
+        },
+        {
           path: "user",
           element:
             <PrivateRoute>
