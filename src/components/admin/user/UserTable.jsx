@@ -4,12 +4,16 @@ import { getUsersWithPaginate } from '../../../services/api';
 import { DeleteOutlined, DownloadOutlined, EditOutlined, ExportOutlined, EyeOutlined, ImportOutlined, PlusOutlined, ReloadOutlined } from '@ant-design/icons';
 import InputSearch from './InputSearch';
 import UserViewDetail from './UserViewDetail';
+import { formatDate } from '../../../services/formatDate';
+import ModalCreateUser from './ModalCreateUser';
+import ModalImport from './ModalImport';
 const data = [
     {
         _id: '',
         fullName: '',
         email: '',
         phone: '',
+        createAt: '',
         role: '',
     }
 ];
@@ -23,6 +27,8 @@ const UserTable = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [openUserDetail, setOpenUserDetail] = useState(false);
     const [dataViewDetail, setDataViewDetail] = useState([]);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isImportOpen, setIsImportOpen] = useState(false);
 
     useEffect(() => {
         const fetchListUser = async () => {
@@ -44,7 +50,6 @@ const UserTable = () => {
             }
             setIsLoading(false);
         }
-
         fetchListUser();
     }, [currentPage, pageSize, searchQuery]);
 
@@ -80,15 +85,15 @@ const UserTable = () => {
         return (
             <>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <div>Danh sách người dùng</div>
+                    <div style={{ fontSize: '18px' }}>Danh sách người dùng</div>
                     <div style={{ display: 'flex', gap: '10px' }}>
-                        <Button type="primary" shape="default" icon={<ImportOutlined />}>
+                        <Button type="primary" shape="default" icon={<ImportOutlined />} onClick={() => setIsModalOpen('import')}>
                             Nhập file
                         </Button>
                         <Button type="primary" shape="default" icon={<ExportOutlined />}>
                             Xuất file
                         </Button>
-                        <Button type="primary" shape="default" icon={<PlusOutlined />}>
+                        <Button type="primary" shape="default" icon={<PlusOutlined />} onClick={() => setIsModalOpen('add')}>
                             Thêm mới
                         </Button>
                         <Button icon={<ReloadOutlined />} />
@@ -125,10 +130,21 @@ const UserTable = () => {
             title: 'Số điện thoại',
             dataIndex: 'phone',
             sorter: (a, b) => a.phone.length - b.phone.length,
-            width: '20%',
+            width: '10%',
         },
         {
-            title: 'Roll',
+            title: 'Ngày tạo',
+            dataIndex: 'createdAt',
+            render: (_, { createdAt }) => formatDate(createdAt),
+            sorter: (a, b) => {
+                const dateA = new Date(a.createdAt);
+                const dateB = new Date(b.createdAt);
+                return dateA - dateB;
+            },
+            width: '15%',
+        },
+        {
+            title: 'Role',
             key: 'role',
             dataIndex: 'role',
             render: (_, { role }) => {
@@ -167,8 +183,6 @@ const UserTable = () => {
         },
     ];
 
-    console.log(dataViewDetail);
-
     return (
         <>
             <UserViewDetail
@@ -178,6 +192,18 @@ const UserTable = () => {
                 dataViewDetail={dataViewDetail}
             />
             <InputSearch searchFilter={searchFilter} />
+            {isModalOpen === 'add' && (
+                <ModalCreateUser
+                    isModalOpen={isModalOpen}
+                    setIsModalOpen={setIsModalOpen}
+                />
+            )}
+            {isModalOpen === 'import' && (
+                <ModalImport
+                    isModalOpen={isModalOpen}
+                    setIsModalOpen={setIsModalOpen}
+                />
+            )}
             <Table
                 title={renderHeader}
                 columns={columns}
