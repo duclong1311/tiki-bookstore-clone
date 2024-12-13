@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Modal, Table } from 'antd';
+import { Modal, notification, Table } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
 import { message, Upload } from 'antd';
 import * as XLSX from "xlsx";
+import { importUser } from '../../../services/api';
 const { Dragger } = Upload;
 
 const ModalImport = ({ isModalOpen, setIsModalOpen }) => {
@@ -38,7 +39,7 @@ const ModalImport = ({ isModalOpen, setIsModalOpen }) => {
                         header: ['fullName', 'email', 'phone'],
                         range: 1,
                     });
-                    setImportData(jsonData);
+                    if (jsonData && jsonData.length > 0) setImportData(jsonData);
                 };
                 reader.readAsArrayBuffer(file);
             } else if (status === 'error') {
@@ -69,12 +70,29 @@ const ModalImport = ({ isModalOpen, setIsModalOpen }) => {
         }
     ];
 
-    const handleOk = () => {
-        setIsModalOpen(false);
+    const handleOk = async () => {
+        const dataSendToApi = importData.map((item) => {
+            item.password = '123456';
+            return item;
+        });
+        const res = await importUser(importData);
+        if (res && res.data && res.data.length > 0) {
+            message.success('Thêm người dùng thành công!');
+            setIsModalOpen(false);
+        } else {
+            notification.error({
+                message: 'Có lỗi xảy ra!',
+                description: 'Email đã tồn tại!',
+                duration: 5,
+                showProgress: true,
+            });
+        }
+
     };
 
     const handleCancel = () => {
         setIsModalOpen(false);
+        setImportData([]);
     };
 
     return (
@@ -86,7 +104,7 @@ const ModalImport = ({ isModalOpen, setIsModalOpen }) => {
                 okText="Import Data"
                 onCancel={handleCancel}
                 okButtonProps={{
-                    disabled: true
+                    disabled: importData.length < 1
                 }}
                 width={'50vw'}
             >
