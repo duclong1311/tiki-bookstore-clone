@@ -4,7 +4,7 @@ import AdminPage from "../admin";
 
 const RoleBaseRoute = (props) => {
     const isAdminRoute = window.location.pathname.startsWith('/admin');
-    const roleUser = useSelector(state => state.account.user.role);
+    const roleUser = useSelector(state => state?.account?.user?.role);
     const isAdmin = isAdminRoute && roleUser === 'ADMIN' ? true : false;
 
     if (isAdmin) {

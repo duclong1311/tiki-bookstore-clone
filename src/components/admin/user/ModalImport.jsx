@@ -4,10 +4,10 @@ import { InboxOutlined } from '@ant-design/icons';
 import { message, Upload } from 'antd';
 import * as XLSX from "xlsx";
 import { importUser } from '../../../services/api';
+import templateFile from './data/template.xlsx?url';
 const { Dragger } = Upload;
 
-const ModalImport = ({ isModalOpen, setIsModalOpen }) => {
-    const [importData, setImportData] = useState([]);
+const ModalImport = ({ isModalOpen, setIsModalOpen, importData, setImportData }) => {
 
     const dummyRequest = ({ file, onSuccess }) => {
         setTimeout(() => {
@@ -75,7 +75,7 @@ const ModalImport = ({ isModalOpen, setIsModalOpen }) => {
             item.password = '123456';
             return item;
         });
-        const res = await importUser(importData);
+        const res = await importUser(dataSendToApi);
         if (res && res.data && res.data.length > 0) {
             message.success('Thêm người dùng thành công!');
             setIsModalOpen(false);
@@ -115,6 +115,7 @@ const ModalImport = ({ isModalOpen, setIsModalOpen }) => {
                     <p className="ant-upload-text">Kéo thả file vào phần này để Upload</p>
                     <p className="ant-upload-hint">
                         Hỗ trợ tải lên một hoặc nhiều tệp. Chỉ cho phép tải lên những tệp có định dạng .xlsx .xls .csv
+                        &nbsp;  <a onClick={e => e.stopPropagation()} href={templateFile} download>Download Template</a>
                     </p>
                 </Dragger>
                 <Table columns={columns} dataSource={importData} style={{ marginTop: '50px' }} />

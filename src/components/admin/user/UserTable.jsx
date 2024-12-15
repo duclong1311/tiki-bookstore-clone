@@ -28,7 +28,8 @@ const UserTable = () => {
     const [openUserDetail, setOpenUserDetail] = useState(false);
     const [dataViewDetail, setDataViewDetail] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isImportOpen, setIsImportOpen] = useState(false);
+    const [importData, setImportData] = useState([]);
+
 
     useEffect(() => {
         const fetchListUser = async () => {
@@ -81,6 +82,12 @@ const UserTable = () => {
         setSearchQuery(query)
     }
 
+    const exportFile = () => {
+        if (importData.length > 0) {
+            console.log('export file');
+        }
+    }
+
     const renderHeader = () => {
         return (
             <>
@@ -90,7 +97,7 @@ const UserTable = () => {
                         <Button type="primary" shape="default" icon={<ImportOutlined />} onClick={() => setIsModalOpen('import')}>
                             Nhập file
                         </Button>
-                        <Button type="primary" shape="default" icon={<ExportOutlined />}>
+                        <Button type="primary" shape="default" icon={<ExportOutlined />} onClick={() => exportFile}>
                             Xuất file
                         </Button>
                         <Button type="primary" shape="default" icon={<PlusOutlined />} onClick={() => setIsModalOpen('add')}>
@@ -202,6 +209,8 @@ const UserTable = () => {
                 <ModalImport
                     isModalOpen={isModalOpen}
                     setIsModalOpen={setIsModalOpen}
+                    importData={importData}
+                    setImportData={setImportData}
                 />
             )}
             <Table
