@@ -28,3 +28,6 @@ export const importUser = (data) => {
     return axios.post('/api/v1/user/bulk-create', data);
 }
 
+export const deleteUser = (Id) => {
+    return axios.delete(`/api/v1/user/${Id}`)
+}

@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Space, Tag, Button } from 'antd';
-import { getUsersWithPaginate } from '../../../services/api';
+import { Table, Space, Tag, Button, Popover, Popconfirm, message, notification } from 'antd';
+import { deleteUser, getUsersWithPaginate } from '../../../services/api';
 import { DeleteOutlined, DownloadOutlined, EditOutlined, ExportOutlined, EyeOutlined, ImportOutlined, PlusOutlined, ReloadOutlined } from '@ant-design/icons';
 import InputSearch from './InputSearch';
 import UserViewDetail from './UserViewDetail';
 import { formatDate } from '../../../services/formatDate';
 import ModalCreateUser from './ModalCreateUser';
 import ModalImport from './ModalImport';
+import * as XLSX from 'xlsx';
+
 const data = [
     {
         _id: '',
@@ -30,27 +32,28 @@ const UserTable = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [importData, setImportData] = useState([]);
 
+    const fetchListUser = async () => {
+        setIsLoading(true);
+
+        let query = `current=${currentPage}&pageSize=${pageSize}`;
+        if (searchQuery) {
+            query += searchQuery;
+        }
+        console.log(searchQuery);
+
+        const res = await getUsersWithPaginate(query);
+
+        if (res && res.data && res.data.result.length > 0) {
+            const listUserData = res.data.result;
+            const metaData = res.data.meta;
+            setListUser(listUserData);
+            setTotalData(metaData.total);
+        }
+        setIsLoading(false);
+    }
+
 
     useEffect(() => {
-        const fetchListUser = async () => {
-            setIsLoading(true);
-
-            let query = `current=${currentPage}&pageSize=${pageSize}`;
-            if (searchQuery) {
-                query += searchQuery;
-            }
-            console.log(searchQuery);
-
-            const res = await getUsersWithPaginate(query);
-
-            if (res && res.data && res.data.result.length > 0) {
-                const listUserData = res.data.result;
-                const metaData = res.data.meta;
-                setListUser(listUserData);
-                setTotalData(metaData.total);
-            }
-            setIsLoading(false);
-        }
         fetchListUser();
     }, [currentPage, pageSize, searchQuery]);
 
@@ -69,9 +72,21 @@ const UserTable = () => {
         console.log('Edit', userId);
     }
 
-    const handleClickDelete = (userId) => {
-        console.log('Delete', userId);
-    }
+    const handleClickDelete = async (userId) => {
+        const res = await deleteUser(userId);
+        if (res && res.data) {
+            message.success('Xóa user thành công');
+            setListUser((prev) => prev.filter((user) => user.id !== userId));
+            setTotalData((prev) => prev - 1);
+            fetchListUser();
+        } else {
+            notification.error({
+                message: 'Có lỗi xảy ra',
+                description: res.message,
+            });
+        }
+    };
+
 
     const handleClickDetailUser = (record) => {
         setOpenUserDetail(true);
@@ -82,10 +97,11 @@ const UserTable = () => {
         setSearchQuery(query)
     }
 
-    const exportFile = () => {
-        if (importData.length > 0) {
-            console.log('export file');
-        }
+    const exportFile = (data) => {
+        const worksheet = XLSX.utils.json_to_sheet(data);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+        XLSX.writeFile(workbook, "ListUser.xlsx");
     }
 
     const renderHeader = () => {
@@ -97,7 +113,7 @@ const UserTable = () => {
                         <Button type="primary" shape="default" icon={<ImportOutlined />} onClick={() => setIsModalOpen('import')}>
                             Nhập file
                         </Button>
-                        <Button type="primary" shape="default" icon={<ExportOutlined />} onClick={() => exportFile}>
+                        <Button type="primary" shape="default" icon={<ExportOutlined />} onClick={() => exportFile(listUser)}>
                             Xuất file
                         </Button>
                         <Button type="primary" shape="default" icon={<PlusOutlined />} onClick={() => setIsModalOpen('add')}>
@@ -169,17 +185,27 @@ const UserTable = () => {
             title: 'Action',
             key: 'action',
             render: (_, record) => (
-                <Space size="middle">
+                <Space size="middle" >
+                    <Popconfirm
+                        placement='leftTop'
+                        title="Xác nhận xóa user"
+                        description="Bạn có chắc chắn muốn xóa user này?"
+                        onConfirm={() => handleClickDelete(record._id)}
+                        onCancel={() => setPopoverOpen(false)}
+                        okText='Xác nhận'
+                        cancelText='Hủy'
+                    >
+                        <span>
+                            <DeleteOutlined style={{ color: 'red', cursor: 'pointer' }} />
+                        </span>
+                    </Popconfirm>
+
                     <a onClick={() => handleClickEdit(record._id)}>
                         <span>
                             <EditOutlined />
                         </span>
                     </a>
-                    <a onClick={() => handleClickDelete(record._id)} style={{ color: 'red' }}>
-                        <span>
-                            <DeleteOutlined />
-                        </span>
-                    </a>
+
                     <a onClick={() => handleClickDetailUser(record)} style={{ color: 'green' }}>
                         <span>
                             <EyeOutlined />
@@ -213,6 +239,7 @@ const UserTable = () => {
                     setImportData={setImportData}
                 />
             )}
+
             <Table
                 title={renderHeader}
                 columns={columns}
