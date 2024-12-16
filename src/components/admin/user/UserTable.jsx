@@ -8,6 +8,7 @@ import { formatDate } from '../../../services/formatDate';
 import ModalCreateUser from './ModalCreateUser';
 import ModalImport from './ModalImport';
 import * as XLSX from 'xlsx';
+import ModalUpdateUser from './ModalUpdateUser';
 
 const data = [
     {
@@ -31,6 +32,7 @@ const UserTable = () => {
     const [dataViewDetail, setDataViewDetail] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [importData, setImportData] = useState([]);
+    const [dataUpdate, setDataUpdate] = useState(null);
 
     const fetchListUser = async () => {
         setIsLoading(true);
@@ -68,8 +70,9 @@ const UserTable = () => {
         setCurrentPage(current);
     };
 
-    const handleClickEdit = (userId) => {
-        console.log('Edit', userId);
+    const handleClickEdit = (record) => {
+        setDataUpdate(record);
+        setIsModalOpen('edit');
     }
 
     const handleClickDelete = async (userId) => {
@@ -86,7 +89,6 @@ const UserTable = () => {
             });
         }
     };
-
 
     const handleClickDetailUser = (record) => {
         setOpenUserDetail(true);
@@ -200,7 +202,7 @@ const UserTable = () => {
                         </span>
                     </Popconfirm>
 
-                    <a onClick={() => handleClickEdit(record._id)}>
+                    <a onClick={() => handleClickEdit(record)}>
                         <span>
                             <EditOutlined />
                         </span>
@@ -229,6 +231,14 @@ const UserTable = () => {
                 <ModalCreateUser
                     isModalOpen={isModalOpen}
                     setIsModalOpen={setIsModalOpen}
+                />
+            )}
+            {isModalOpen === 'edit' && (
+                <ModalUpdateUser
+                    isModalOpen={isModalOpen}
+                    setIsModalOpen={setIsModalOpen}
+                    dataUpdate={dataUpdate}
+                    setDataUpdate={setDataUpdate}
                 />
             )}
             {isModalOpen === 'import' && (

@@ -31,3 +31,7 @@ export const importUser = (data) => {
 export const deleteUser = (Id) => {
     return axios.delete(`/api/v1/user/${Id}`)
 }
+
+export const updateUser = (_id, fullName, phone) => {
+    return axios.put('/api/v1/user', { _id, fullName, phone });
+}
