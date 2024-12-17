@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Table, Space, Tag, Button, Popover, Popconfirm, message, notification } from 'antd';
 import { deleteUser, getUsersWithPaginate } from '../../../services/api';
-import { DeleteOutlined, DownloadOutlined, EditOutlined, ExportOutlined, EyeOutlined, ImportOutlined, PlusOutlined, ReloadOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, ExportOutlined, EyeOutlined, ImportOutlined, PlusOutlined, ReloadOutlined } from '@ant-design/icons';
 import InputSearch from './InputSearch';
 import UserViewDetail from './UserViewDetail';
 import { formatDate } from '../../../services/formatDate';
@@ -34,26 +34,26 @@ const UserTable = () => {
     const [importData, setImportData] = useState([]);
     const [dataUpdate, setDataUpdate] = useState(null);
 
-    const fetchListUser = async () => {
+    const fetchListUser = useCallback(async () => {
         setIsLoading(true);
-
-        let query = `current=${currentPage}&pageSize=${pageSize}`;
-        if (searchQuery) {
-            query += searchQuery;
+        try {
+            let query = `current=${currentPage}&pageSize=${pageSize}`;
+            if (searchQuery) {
+                query += searchQuery;
+            }
+            const res = await getUsersWithPaginate(query);
+            if (res && res.data && res.data.result.length > 0) {
+                const listUserData = res.data.result;
+                const metaData = res.data.meta;
+                setListUser(listUserData);
+                setTotalData(metaData.total);
+            }
+        } catch (error) {
+            message.error('Failed to fetch book data.');
+        } finally {
+            setIsLoading(false);
         }
-        console.log(searchQuery);
-
-        const res = await getUsersWithPaginate(query);
-
-        if (res && res.data && res.data.result.length > 0) {
-            const listUserData = res.data.result;
-            const metaData = res.data.meta;
-            setListUser(listUserData);
-            setTotalData(metaData.total);
-        }
-        setIsLoading(false);
-    }
-
+    }, [currentPage, pageSize, searchQuery]);
 
     useEffect(() => {
         fetchListUser();
@@ -95,6 +95,11 @@ const UserTable = () => {
         setDataViewDetail(record);
     }
 
+    const handleResetTable = () => {
+        setSearchQuery(null);
+        fetchListUser();
+    }
+
     const searchFilter = (query) => {
         setSearchQuery(query)
     }
@@ -121,7 +126,7 @@ const UserTable = () => {
                         <Button type="primary" shape="default" icon={<PlusOutlined />} onClick={() => setIsModalOpen('add')}>
                             Thêm mới
                         </Button>
-                        <Button icon={<ReloadOutlined />} />
+                        <Button icon={<ReloadOutlined />} onClick={handleResetTable} />
                     </div>
                 </div>
             </>
@@ -256,7 +261,7 @@ const UserTable = () => {
                 dataSource={listUser}
                 onChange={onTableChange}
                 rowKey={'_id'}
-                isLoading={isLoading}
+                loading={isLoading}
                 pagination={
                     {
                         current: currentPage,

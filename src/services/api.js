@@ -1,5 +1,7 @@
 import axios from '../utils/axios-customize';
 
+// Login, Register & everything about account
+
 export const callRegister = (fullName, email, password, phone) => {
     return axios.post('/api/v1/user/register', { fullName, email, password, phone });
 }
@@ -15,6 +17,8 @@ export const callLogout = () => {
 export const getAccount = () => {
     return axios.get('/api/v1/auth/account');
 }
+
+// Manage User
 
 export const getUsersWithPaginate = (query) => {
     return axios.get(`/api/v1/user?${query}`);
@@ -34,4 +38,14 @@ export const deleteUser = (Id) => {
 
 export const updateUser = (_id, fullName, phone) => {
     return axios.put('/api/v1/user', { _id, fullName, phone });
+}
+
+// Manage Book
+
+export const getBookWithPaginate = (query) => {
+    return axios.get(`/api/v1/book?${query}`);
+}
+
+export const deleteBook = (Id) => {
+    return axios.delete(`/api/v1/book/${Id}`);
 }

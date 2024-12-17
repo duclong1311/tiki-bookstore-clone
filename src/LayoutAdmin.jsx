@@ -31,7 +31,7 @@ const items = [
         getItem('CRUD User', 'user'),
     ]),
     getItem('Mange Book', 'sub2', <BookOutlined />, [
-        getItem('Team 1', '6'),
+        getItem('CRUD Book', 'book'),
         getItem('Team 2', '8'),
     ]),
     getItem('Mange Order', '9', <FileOutlined />),

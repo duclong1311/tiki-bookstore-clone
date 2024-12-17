@@ -7,7 +7,6 @@ import { FaShippingFast } from "react-icons/fa";
 import { FaTags } from "react-icons/fa6";
 import { IoLogoReact } from "react-icons/io5";
 import { SlMagnifier } from "react-icons/sl";
-import { RiAccountCircleLine } from "react-icons/ri";
 import { IoCartOutline } from "react-icons/io5";
 import './header.scss';
 import { callLogout } from '../../services/api';
