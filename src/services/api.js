@@ -46,6 +46,26 @@ export const getBookWithPaginate = (query) => {
     return axios.get(`/api/v1/book?${query}`);
 }
 
+export const uploadBookImage = (fileImg) => {
+    let formData = new FormData();
+    formData.append('fileImg', fileImg);
+
+    return axios.post(`/api/v1/file/upload`, formData, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+            "upload-type": "book"
+        }
+    });
+}
+
+export const createBook = (thumbnail, slider, mainText, author, price, sold, quantity, category) => {
+    return axios.post('api/v1/book', { thumbnail, slider, mainText, author, price, sold, quantity, category });
+}
+
 export const deleteBook = (Id) => {
     return axios.delete(`/api/v1/book/${Id}`);
+}
+
+export const getBookCategory = () => {
+    return axios.get(`/api/v1/database/category`);
 }
