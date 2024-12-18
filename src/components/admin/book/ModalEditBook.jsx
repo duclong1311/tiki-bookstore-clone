@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Button, Col, Form, Input, InputNumber, message, Modal, notification, Row, Select, Upload, Image, Divider } from 'antd';
-import { createBook, getBookCategory, uploadBookImage } from '../../../services/api';
+import { createBook, getBookCategory, updateBook, uploadBookImage } from '../../../services/api';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import { v4 as uuidv4 } from 'uuid';
 const baseUrl = import.meta.env.VITE_BACKEND_URL;
@@ -12,7 +12,7 @@ const getBase64 = (img, callback) => {
 };
 
 const ModalEditBook = (props) => {
-    const { setIsModalOpen, isModalOpen, dataViewDetail, setDataViewDetail } = props;
+    const { setIsModalOpen, isModalOpen, dataViewDetail, setDataViewDetail, fetchListBook } = props;
 
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
@@ -25,8 +25,6 @@ const ModalEditBook = (props) => {
     const [previewImage, setPreviewImage] = useState('');
     const [previewTitle, setPreviewTitle] = useState('');
     const [initForm, setInitForm] = useState(null);
-
-
 
     useEffect(() => {
         const fetchSelectCategory = async () => {
@@ -74,6 +72,7 @@ const ModalEditBook = (props) => {
             setInitForm(initValues);
             setThumbnailData(arrThumbnail);
             setSliderData(arrSlider);
+
             form.setFieldsValue(initValues);
         }
 
@@ -119,7 +118,8 @@ const ModalEditBook = (props) => {
     };
 
     const onFinish = async (values) => {
-        const { mainText, author, price, sold, quantity, category } = values;
+        const { _id, mainText, author, price, sold, quantity, category } = values;
+
         if (thumbnailData && thumbnailData.length === 0) {
             notification.error({
                 message: 'Error',
@@ -139,13 +139,16 @@ const ModalEditBook = (props) => {
         const slider = sliderData.map(item => item.name);
 
         try {
-            const res = await createBook(thumbnail, slider, mainText, author, price, sold, quantity, category)
+            const res = await updateBook(_id, thumbnail, slider, mainText, author, price, sold, quantity, category)
             if (res && res.data) {
-                console.log(res);
-                message.success('Thêm mới sách thành công!');
+                message.success('Sửa thông tin sách thành công!');
+                await fetchListBook();
             }
         } catch (error) {
-            message.error(error);
+            notification.error({
+                message: 'Đã có lỗi xảy ra',
+                description: error?.response?.data?.message || error.message || 'Có lỗi không xác định xảy ra.',
+            })
         } finally {
             form.resetFields();
             setThumbnailData([]);
@@ -155,51 +158,40 @@ const ModalEditBook = (props) => {
     };
 
     const handleUploadFileThumbnail = async ({ file, onSuccess, onError }) => {
-        try {
-            const res = await uploadBookImage(file);
-            if (res && res.data) {
-                setThumbnailData([{
-                    uid: file?.uid,
-                    name: res?.data?.fileUploaded
-                }]);
-            }
-        } catch (error) {
-            onError('Đã xảy ra lỗi khi up file: ', error)
-        } finally {
-            onSuccess("ok");
+        const res = await uploadBookImage(file);
+        if (res && res.data) {
+            setThumbnailData([{
+                name: res.data.fileUploaded,
+                uid: file.uid
+            }])
+            onSuccess('ok')
+        } else {
+            onError('Đã có lỗi khi upload file');
         }
-    }
-
-    const handleUploadFileSlider = async ({ file, onSuccess, onError }) => {
-        try {
-            const res = await uploadBookImage(file);
-            if (res && res.data) {
-                setSliderData((slider) => [...slider, {
-                    uid: file?.uid,
-                    name: res?.data?.fileUploaded
-                }]);
-            }
-        } catch (error) {
-            onError('Đã xảy ra lỗi khi up file: ', error)
-        } finally {
-            onSuccess("ok");
-        }
-    }
-
-    const handlePreview = async (file) => {
-        if (file.url && !file.originFileObj) {
-            setPreviewImage(file.url);
-            setPreviewOpen(true);
-            setPreviewTitle(file.name || file.url.substring(file.url.lastIndexOf('/') + 1));
-            return;
-        }
-        getBase64(file.originFileObj, (url) => {
-            setPreviewImage(url);
-            setPreviewOpen(true);
-            setPreviewTitle(file.name || file.url.substring(file.url.lastIndexOf('/') + 1));
-        });
     };
 
+    const handleUploadFileSlider = async ({ file, onSuccess, onError }) => {
+        const res = await uploadBookImage(file);
+        if (res && res.data) {
+            //copy previous state => upload multiple images
+            setSliderData((dataSlider) => [...dataSlider, {
+                name: res.data.fileUploaded,
+                uid: file.uid
+            }])
+            onSuccess('ok')
+        } else {
+            onError('Đã có lỗi khi upload file');
+        }
+    };
+
+
+    const handlePreview = async (file) => {
+        if (!file.url && !file.preview) {
+            file.preview = await getImageBase64(file.originFileObj);
+        }
+        setPreviewImage(file.url || file.preview);
+        setPreviewOpen(true);
+    };
 
     return (
         <>
@@ -217,6 +209,17 @@ const ModalEditBook = (props) => {
                     form={form}
                 >
                     <Row gutter={[8, 0]}>
+                        <Col hidden>
+                            <Form.Item
+                                hidden
+                                labelCol={{ span: 24 }}
+                                label="Tên sách"
+                                name="_id"
+                            >
+                                <Input />
+                            </Form.Item>
+                        </Col>
+
                         <Col span={12}>
                             <Form.Item
                                 labelCol={{ span: 24 }}
@@ -308,22 +311,13 @@ const ModalEditBook = (props) => {
                                     beforeUpload={beforeUpload}
                                     onChange={handleChange}
                                     onPreview={handlePreview}
+                                    // fileList={thumbnailData}
                                     defaultFileList={initForm?.thumbnail?.fileList ?? []}
                                 >
                                     <div>
                                         {loading ? <LoadingOutlined /> : <PlusOutlined />}
                                         <div style={{ marginTop: 8 }}>Upload</div>
-                                        {previewImage && (
-                                            <Image
-                                                wrapperStyle={{ display: 'none' }}
-                                                preview={{
-                                                    visible: previewOpen,
-                                                    onVisibleChange: (visible) => setPreviewOpen(visible),
-                                                    afterOpenChange: (visible) => !visible && setPreviewImage(''),
-                                                }}
-                                                src={previewImage}
-                                            />
-                                        )}
+
                                     </div>
 
                                 </Upload>
@@ -344,6 +338,7 @@ const ModalEditBook = (props) => {
                                     beforeUpload={beforeUpload}
                                     onChange={(info) => handleChange(info, 'slider')}
                                     onPreview={handlePreview}
+                                    // fileList={sliderData}
                                     defaultFileList={initForm?.slider?.fileList ?? []}
                                 >
                                     <div>
@@ -356,6 +351,18 @@ const ModalEditBook = (props) => {
                     </Row>
                 </Form>
             </Modal>
+
+            {previewImage && (
+                <Image
+                    wrapperStyle={{ display: 'none' }}
+                    preview={{
+                        visible: previewOpen,
+                        onVisibleChange: (visible) => setPreviewOpen(visible),
+                        afterOpenChange: (visible) => !visible && setPreviewImage(''),
+                    }}
+                    src={previewImage}
+                />
+            )}
         </>
     );
 };

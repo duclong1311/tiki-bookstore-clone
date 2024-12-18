@@ -62,6 +62,10 @@ export const createBook = (thumbnail, slider, mainText, author, price, sold, qua
     return axios.post('api/v1/book', { thumbnail, slider, mainText, author, price, sold, quantity, category });
 }
 
+export const updateBook = (id, thumbnail, slider, mainText, author, price, sold, quantity, category) => {
+    return axios.put(`/api/v1/book/${id}`, { thumbnail, slider, mainText, author, price, sold, quantity, category });
+}
+
 export const deleteBook = (Id) => {
     return axios.delete(`/api/v1/book/${Id}`);
 }

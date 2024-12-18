@@ -255,19 +255,7 @@ const ModalCreateBook = (props) => {
                                     <div>
                                         {loading ? <LoadingOutlined /> : <PlusOutlined />}
                                         <div style={{ marginTop: 8 }}>Upload</div>
-                                        {previewImage && (
-                                            <Image
-                                                wrapperStyle={{ display: 'none' }}
-                                                preview={{
-                                                    visible: previewOpen,
-                                                    onVisibleChange: (visible) => setPreviewOpen(visible),
-                                                    afterOpenChange: (visible) => !visible && setPreviewImage(''),
-                                                }}
-                                                src={previewImage}
-                                            />
-                                        )}
                                     </div>
-
                                 </Upload>
                             </Form.Item>
                         </Col>
@@ -297,6 +285,18 @@ const ModalCreateBook = (props) => {
                     </Row>
                 </Form>
             </Modal>
+
+            {previewImage && (
+                <Image
+                    wrapperStyle={{ display: 'none' }}
+                    preview={{
+                        visible: previewOpen,
+                        onVisibleChange: (visible) => setPreviewOpen(visible),
+                        afterOpenChange: (visible) => !visible && setPreviewImage(''),
+                    }}
+                    src={previewImage}
+                />
+            )}
         </>
     );
 };

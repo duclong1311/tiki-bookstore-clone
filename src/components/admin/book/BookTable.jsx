@@ -25,22 +25,29 @@ const BookTable = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [isModalOpen, setIsModalOpen] = useState('');
     const [dataViewDetail, setDataViewDetail] = useState(null);
-    
+
     // Fetch books with pagination
     const fetchListBook = useCallback(async () => {
         setIsLoading(true);
         try {
             let query = `current=${currentPage}&pageSize=${pageSize}`;
             if (searchQuery) {
-                query += searchQuery;
+                query += `&${searchQuery}`;
             }
+
             const res = await getBookWithPaginate(query);
-            if (res?.data) {
-                setListBook(res.data.result || []);
-                setTotalData(res.data.meta?.total || 0);
+
+            if (res?.data?.result) {
+                setListBook(res.data.result);
+            } else {
+                setListBook([]);
+                message.warning('Không có dữ liệu sách để hiển thị.');
             }
+
+            setTotalData(res?.data?.meta?.total || 0);
         } catch (error) {
-            message.error('Failed to fetch book data.');
+            const errorMessage = error?.response?.data?.message || error.message || 'Có lỗi xảy ra khi lấy dữ liệu sách.';
+            message.error(errorMessage);
         } finally {
             setIsLoading(false);
         }
@@ -207,6 +214,7 @@ const BookTable = () => {
                     setIsModalOpen={setIsModalOpen}
                     dataViewDetail={dataViewDetail}
                     setDataViewDetail={setDataViewDetail}
+                    fetchListBook={fetchListBook}
                 />
             )}
             <Table
