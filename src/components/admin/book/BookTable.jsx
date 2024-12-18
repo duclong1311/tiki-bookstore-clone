@@ -14,6 +14,7 @@ import { formatDate } from '../../../services/formatDate';
 import InputSearch from './InputSearch';
 import ModalCreateBook from './ModalCreateBook';
 import BookDetail from './BookDetail';
+import ModalEditBook from './ModalEditBook';
 
 const BookTable = () => {
     const [listBook, setListBook] = useState([]);
@@ -23,8 +24,8 @@ const BookTable = () => {
     const [totalData, setTotalData] = useState(1);
     const [searchQuery, setSearchQuery] = useState('');
     const [isModalOpen, setIsModalOpen] = useState('');
-    const [dataViewDetail, setDataViewDetail] = useState([]);
-
+    const [dataViewDetail, setDataViewDetail] = useState(null);
+    
     // Fetch books with pagination
     const fetchListBook = useCallback(async () => {
         setIsLoading(true);
@@ -64,7 +65,8 @@ const BookTable = () => {
 
     const handleEditBook = (record) => {
         // Placeholder for edit logic
-        console.log('Editing book:', record);
+        setDataViewDetail(record);
+        setIsModalOpen('edit');
     };
 
     const handleExportFile = () => {
@@ -80,7 +82,6 @@ const BookTable = () => {
     const handleViewBookDetail = (record) => {
         setIsModalOpen('bookDetail');
         setDataViewDetail(record);
-        console.log(record);
     }
 
     const searchFilter = (query) => {
@@ -198,6 +199,14 @@ const BookTable = () => {
                 <ModalCreateBook
                     isModalOpen={isModalOpen}
                     setIsModalOpen={setIsModalOpen}
+                />
+            )}
+            {isModalOpen === 'edit' && (
+                <ModalEditBook
+                    isModalOpen={isModalOpen}
+                    setIsModalOpen={setIsModalOpen}
+                    dataViewDetail={dataViewDetail}
+                    setDataViewDetail={setDataViewDetail}
                 />
             )}
             <Table

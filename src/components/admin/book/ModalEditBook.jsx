@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Button, Col, Form, Input, InputNumber, message, Modal, notification, Row, Select, Upload, Image } from 'antd';
-import { createBook, createUser, getBookCategory, uploadBookImage } from '../../../services/api';
+import { Button, Col, Form, Input, InputNumber, message, Modal, notification, Row, Select, Upload, Image, Divider } from 'antd';
+import { createBook, getBookCategory, uploadBookImage } from '../../../services/api';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
-import { getImageBase64 } from '../../../services/getBase64';
+import { v4 as uuidv4 } from 'uuid';
+const baseUrl = import.meta.env.VITE_BACKEND_URL;
 
 const getBase64 = (img, callback) => {
     const reader = new FileReader();
@@ -10,8 +11,8 @@ const getBase64 = (img, callback) => {
     reader.readAsDataURL(img);
 };
 
-const ModalCreateBook = (props) => {
-    const { setIsModalOpen, isModalOpen } = props;
+const ModalEditBook = (props) => {
+    const { setIsModalOpen, isModalOpen, dataViewDetail, setDataViewDetail } = props;
 
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
@@ -22,19 +23,64 @@ const ModalCreateBook = (props) => {
     const [sliderData, setSliderData] = useState([]);
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
+    const [previewTitle, setPreviewTitle] = useState('');
+    const [initForm, setInitForm] = useState(null);
 
-    const fetchSelectCategory = useCallback(async () => {
-        const res = await getBookCategory();
-        if (res && res.data && res.data.length > 0) {
-            const selectList = res.data.map(item => { return { label: item, value: item } });
-            if (selectList.length > 0)
-                setSelectCategory(selectList);
-        }
-    }, []);
+
 
     useEffect(() => {
+        const fetchSelectCategory = async () => {
+            const res = await getBookCategory();
+            if (res && res.data && res.data.length > 0) {
+                const selectList = res.data.map(item => { return { label: item, value: item } });
+                if (selectList.length > 0)
+                    setSelectCategory(selectList);
+            }
+        };
+
         fetchSelectCategory();
-    }, [fetchSelectCategory])
+    }, [])
+
+    useEffect(() => {
+        if (dataViewDetail?._id) {
+            const arrThumbnail = [{
+                uid: uuidv4(),
+                name: dataViewDetail?.thumbnail,
+                status: 'done',
+                url: `${baseUrl}/images/book/${dataViewDetail?.thumbnail}`,
+            }];
+
+            const arrSlider = dataViewDetail?.slider?.map((item) => {
+                return {
+                    uid: uuidv4(),
+                    name: item,
+                    status: 'done',
+                    url: `${baseUrl}/images/book/${item}`,
+                }
+            })
+
+            const initValues = {
+                _id: dataViewDetail._id,
+                mainText: dataViewDetail.mainText,
+                author: dataViewDetail.author,
+                price: dataViewDetail.price,
+                category: dataViewDetail.category,
+                quantity: dataViewDetail.quantity,
+                sold: dataViewDetail.sold,
+                thumbnail: { fileList: arrThumbnail },
+                slider: { fileList: arrSlider }
+            }
+
+            setInitForm(initValues);
+            setThumbnailData(arrThumbnail);
+            setSliderData(arrSlider);
+            form.setFieldsValue(initValues);
+        }
+
+        return () => {
+            form.resetFields();
+        }
+    }, [dataViewDetail]);
 
     const handleOk = () => {
         form.submit(onFinish);
@@ -42,7 +88,8 @@ const ModalCreateBook = (props) => {
 
     const handleCancel = () => {
         setIsModalOpen(false);
-        form.resetFields();
+        setInitForm(null);
+        setDataViewDetail(null);
     };
 
     const beforeUpload = (file) => {
@@ -94,6 +141,7 @@ const ModalCreateBook = (props) => {
         try {
             const res = await createBook(thumbnail, slider, mainText, author, price, sold, quantity, category)
             if (res && res.data) {
+                console.log(res);
                 message.success('Thêm mới sách thành công!');
             }
         } catch (error) {
@@ -111,8 +159,8 @@ const ModalCreateBook = (props) => {
             const res = await uploadBookImage(file);
             if (res && res.data) {
                 setThumbnailData([{
-                    name: res?.data?.fileUploaded,
-                    uid: file?.uid
+                    uid: file?.uid,
+                    name: res?.data?.fileUploaded
                 }]);
             }
         } catch (error) {
@@ -127,8 +175,8 @@ const ModalCreateBook = (props) => {
             const res = await uploadBookImage(file);
             if (res && res.data) {
                 setSliderData((slider) => [...slider, {
-                    name: res?.data?.fileUploaded,
-                    uid: file?.uid
+                    uid: file?.uid,
+                    name: res?.data?.fileUploaded
                 }]);
             }
         } catch (error) {
@@ -139,21 +187,30 @@ const ModalCreateBook = (props) => {
     }
 
     const handlePreview = async (file) => {
-        if (!file.url && !file.preview) {
-            file.preview = await getImageBase64(file.originFileObj);
+        if (file.url && !file.originFileObj) {
+            setPreviewImage(file.url);
+            setPreviewOpen(true);
+            setPreviewTitle(file.name || file.url.substring(file.url.lastIndexOf('/') + 1));
+            return;
         }
-        setPreviewImage(file.url || file.preview);
-        setPreviewOpen(true);
+        getBase64(file.originFileObj, (url) => {
+            setPreviewImage(url);
+            setPreviewOpen(true);
+            setPreviewTitle(file.name || file.url.substring(file.url.lastIndexOf('/') + 1));
+        });
     };
+
 
     return (
         <>
-            <Modal title="Thêm mới người dùng"
+            <Modal title="Sửa thông tin sách"
                 open={isModalOpen}
                 onOk={handleOk}
                 onCancel={handleCancel}
                 width={'50vw'}
             >
+                <Divider />
+
                 <Form
                     name="basic"
                     onFinish={onFinish}
@@ -221,7 +278,7 @@ const ModalCreateBook = (props) => {
                                 name="quantity"
                                 rules={[{ required: true, message: 'Số lượng không được để trống!' }]}
                             >
-                                <InputNumber min={1} defaultValue={10} style={{ width: '100%' }} />
+                                <InputNumber min={1} initialValues={10} style={{ width: '100%' }} />
                             </Form.Item>
                         </Col>
                         <Col span={6}>
@@ -230,7 +287,7 @@ const ModalCreateBook = (props) => {
                                 label="Đã bán"
                                 name="sold"
                             >
-                                <InputNumber min={0} defaultValue={0} style={{ width: '100%' }} />
+                                <InputNumber min={0} initialValues={0} style={{ width: '100%' }} />
                             </Form.Item>
                         </Col>
                     </Row>
@@ -251,6 +308,7 @@ const ModalCreateBook = (props) => {
                                     beforeUpload={beforeUpload}
                                     onChange={handleChange}
                                     onPreview={handlePreview}
+                                    defaultFileList={initForm?.thumbnail?.fileList ?? []}
                                 >
                                     <div>
                                         {loading ? <LoadingOutlined /> : <PlusOutlined />}
@@ -286,6 +344,7 @@ const ModalCreateBook = (props) => {
                                     beforeUpload={beforeUpload}
                                     onChange={(info) => handleChange(info, 'slider')}
                                     onPreview={handlePreview}
+                                    defaultFileList={initForm?.slider?.fileList ?? []}
                                 >
                                     <div>
                                         {loadingSlider ? <LoadingOutlined /> : <PlusOutlined />}
@@ -300,4 +359,4 @@ const ModalCreateBook = (props) => {
         </>
     );
 };
-export default ModalCreateBook;
+export default ModalEditBook;
