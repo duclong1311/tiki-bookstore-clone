@@ -75,3 +75,7 @@ export const getBookCategory = () => {
 }
 
 // Homepage
+
+export const getBookById = (id) => {
+    return axios.get(`/api/v1/book/${id}`);
+}
