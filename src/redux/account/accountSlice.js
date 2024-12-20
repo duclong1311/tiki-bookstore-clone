@@ -48,6 +48,6 @@ export const accountSlice = createSlice({
     },
 });
 
-export const { doLoginAction } = accountSlice.actions;
+export const { doLoginAction, doLogoutAction } = accountSlice.actions;
 
 export default accountSlice.reducer;

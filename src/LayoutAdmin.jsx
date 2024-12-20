@@ -1,16 +1,22 @@
 import React, { useState } from 'react';
 import {
-    DesktopOutlined,
     FileOutlined,
     PieChartOutlined,
-    BookOutlined,
+    DownOutlined,
+    homepage,
     UserOutlined,
+    BookOutlined
 } from '@ant-design/icons';
-import { Breadcrumb, Layout, Menu, theme } from 'antd';
+import { Breadcrumb, Layout, Menu, theme, Dropdown, Space, message, notification, Avatar } from 'antd';
 import { RiAdminLine } from "react-icons/ri";
 import './layoutAdmin.scss';
-import { Outlet } from 'react-router';
+import { Link, Outlet, useNavigate } from 'react-router-dom';
 import Footer from "./components/footer";
+import { useDispatch, useSelector } from 'react-redux';
+import { callLogout } from './services/api';
+import { doLogoutAction } from './redux/account/accountSlice';
+const baseUrl = import.meta.env.VITE_BACKEND_URL;
+
 const { Header, Content, Sider } = Layout;
 function getItem(label, key, icon, children) {
     return {
@@ -20,27 +26,67 @@ function getItem(label, key, icon, children) {
         label,
     };
 }
+
 const items = [
-    getItem('Dash Board', '1', <PieChartOutlined />),
-    getItem('Option 2', '2', <DesktopOutlined />),
-    getItem('Manage Users', 'sub1', <UserOutlined />, [
-        getItem('Tom', '3'),
-        getItem('Bill', '4'),
-        getItem('Alex', '5'),
+    getItem('Dash Board', 'dashboard', <PieChartOutlined />),
+    getItem('Mange User', 'manage-user', <UserOutlined />, [
+        getItem('CRUD User', 'user'),
     ]),
-    getItem('Manage Book', 'sub2', <BookOutlined />, [
-        getItem('Team 1', '6'),
-        getItem('Team 2', '8')
+    getItem('Mange Book', 'sub2', <BookOutlined />, [
+        getItem('CRUD Book', 'book'),
+        getItem('Team 2', '8'),
     ]),
-    getItem('Manage Order', '9', <FileOutlined />),
+    getItem('Mange Order', '9', <FileOutlined />),
 ];
+
+
+
 const LayoutAdmin = () => {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const userInfor = useSelector(state => state.account.user);
+
     const [collapsed, setCollapsed] = useState(false);
+    const [pageUrl, setPageUrl] = useState('/');
+
     const {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
+
+    const handleLogout = async () => {
+        const res = await callLogout();
+        if (res && res?.data) {
+            dispatch(doLogoutAction());
+            message.success('Đăng xuất thành công');
+            navigate('/login');
+        } else {
+            notification.error({
+                description: 'Lỗi không xác định, bạn chưa thể đăng xuất!',
+                message: 'Có lỗi xảy ra',
+                showProgress: true,
+            });
+        }
+    }
+
+    const itemsDropdown = [
+        {
+            label: <label>Quản lý tài khoản</label>,
+            key: 'account',
+        },
+        {
+            key: 'homepage',
+            label: <Link to="/" >Trang chủ</Link>,
+        },
+        {
+            label: <label >Đăng xuất</label>,
+            key: 'logout',
+            onClick: handleLogout
+        },
+    ];
+
     return (
         <Layout
+            className="layout-admin"
             style={{
                 minHeight: '100vh',
             }}
@@ -50,32 +96,57 @@ const LayoutAdmin = () => {
                     <RiAdminLine style={{ fontSize: '22px' }} />
                     <div>ADMIN</div>
                 </div>
-                <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" items={items} />
+                <Menu
+                    theme="dark"
+                    defaultSelectedKeys={['dashboard']}
+                    mode="inline"
+                    items={items}
+                    onSelect={({ key }) => navigate(`/admin/${key}`)}
+                />
             </Sider>
-            <Layout>
+            <Layout >
                 <Header
                     style={{
                         padding: 0,
                         background: colorBgContainer,
                     }}
-                />
+                >
+                    <div className='admin-header'>
+
+                        <Dropdown menu={{ items: itemsDropdown }} trigger={['click']} className='admin-header__account'>
+                            <a onClick={(e) => e.preventDefault()}>
+                                <Space>
+                                    <Avatar
+                                        size="large"
+                                        icon={<UserOutlined />}
+                                        src={`${baseUrl}/images/avatar/${userInfor?.avatar}`}
+                                    />
+                                    {userInfor?.fullName}
+                                    <DownOutlined />
+                                </Space>
+                            </a>
+                        </Dropdown>
+                    </div>
+                </Header>
                 <Content
                     style={{
                         margin: '0 16px',
+                        overflow: "auto"
                     }}
                 >
                     <Breadcrumb
                         style={{
                             margin: '16px 0',
                         }}
-                    >
-                        <Breadcrumb.Item>User</Breadcrumb.Item>
-                        <Breadcrumb.Item>Bill</Breadcrumb.Item>
-                    </Breadcrumb>
+                        items={[
+                            { title: 'Home' },
+                            { title: 'About' },
+                        ]}
+                    />
                     <div
                         style={{
                             padding: 24,
-                            minHeight: '88%',
+                            minHeight: '86%',
                             background: colorBgContainer,
                             borderRadius: borderRadiusLG,
                         }}

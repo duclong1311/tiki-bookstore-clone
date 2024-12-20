@@ -1,4 +1,4 @@
-import { Divider, Badge, Dropdown, message, notification } from 'antd';
+import { Divider, Badge, Dropdown, message, notification, Avatar } from 'antd';
 import { TiTick } from "react-icons/ti";
 import { FaCarSide } from "react-icons/fa";
 import { MdCurrencyExchange } from "react-icons/md";
@@ -7,34 +7,27 @@ import { FaShippingFast } from "react-icons/fa";
 import { FaTags } from "react-icons/fa6";
 import { IoLogoReact } from "react-icons/io5";
 import { SlMagnifier } from "react-icons/sl";
-import { RiAccountCircleLine } from "react-icons/ri";
 import { IoCartOutline } from "react-icons/io5";
 import './header.scss';
 import { callLogout } from '../../services/api';
 import { useNavigate } from 'react-router';
-import { useSelector } from 'react-redux';
-
-const items = [
-    {
-        key: 'account',
-        label: <label>Quản lý tài khoản</label>,
-    },
-    {
-        key: 'logout',
-        danger: true,
-        label: <label>Đăng xuất</label>,
-    },
-];
+import { useDispatch, useSelector } from 'react-redux';
+import { doLogoutAction } from '../../redux/account/accountSlice';
+import { UserOutlined } from '@ant-design/icons';
+import { Link } from 'react-router-dom';
+const baseUrl = import.meta.env.VITE_BACKEND_URL;
 
 const Header = () => {
     const navigate = useNavigate();
 
     const isLogin = useSelector(state => state.account.isAuthenticated);
     const userInfor = useSelector(state => state.account.user);
+    const dispatch = useDispatch();
 
     const handleLogout = async () => {
         const res = await callLogout();
         if (res && res?.data) {
+            dispatch(doLogoutAction());
             message.success('Đăng xuất thành công');
             navigate('/');
         } else {
@@ -45,6 +38,27 @@ const Header = () => {
             });
         }
     }
+
+    console.log(userInfor);
+
+    let items = [
+        {
+            key: 'adminPage',
+            label: <Link to="/admin" >Trang quản trị</Link>,
+            disabled: userInfor?.role === 'USER' ? true : false,
+        },
+        {
+            key: 'account',
+            label: <label>Quản lý tài khoản</label>,
+        },
+        {
+            key: 'logout',
+            danger: true,
+            label: <label>Đăng xuất</label>,
+            onClick: handleLogout,
+        },
+
+    ];
 
     return (
         <>
@@ -62,15 +76,22 @@ const Header = () => {
                     <div className='header-top__right'>
                         <div className="header-top__account">
                             {isLogin ?
-                                <Dropdown menu={{ items }} trigger={['click']}>
-                                    <a onClick={(e) => e.preventDefault()}>
-                                        {`Xin chào, ${userInfor?.fullName}`}
-                                    </a>
-                                </Dropdown>
+                                <>
+                                    <Avatar
+                                        size="large"
+                                        icon={<UserOutlined />}
+                                        src={`${baseUrl}/images/avatar/${userInfor?.avatar}`}
+                                        style={{ fontSize: "32px", marginLeft: '5px' }}
+                                    />
+                                    <Dropdown menu={{ items }} trigger={['click']}>
+                                        <a onClick={(e) => e.preventDefault()}>
+                                            {`${userInfor?.fullName}`}
+                                        </a>
+                                    </Dropdown>
+                                </>
                                 :
-                                <span>Tài khoản</span>
+                                <span><UserOutlined style={{ fontSize: "32px", marginRight: '5px' }} />Tài khoản</span>
                             }
-                            <RiAccountCircleLine style={{ fontSize: "32px", marginLeft: '5px' }} />
                         </div>
                         <Divider type="vertical" style={{ borderLeft: '2px solid #ccc', height: '28px' }} />
                         <div className="header-top__cart">

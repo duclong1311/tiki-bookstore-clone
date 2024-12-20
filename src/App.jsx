@@ -17,6 +17,9 @@ import ErrorPage from './pages/error';
 import AdminPage from './pages/admin';
 import PrivateRoute from './pages/protected';
 import LayoutAdmin from './LayoutAdmin';
+import ManageUserPage from './pages/admin/user';
+import MangeBookPage from './pages/admin/book';
+import MangeOrderPage from './pages/admin/order';
 
 export default function App() {
   const dispatch = useDispatch();
@@ -42,11 +45,11 @@ export default function App() {
       children: [
         { index: true, element: <Home /> },
         {
-          path: "/contact",
+          path: "contact",
           element: <ContactPage />,
         },
         {
-          path: "/book",
+          path: "book/:slug",
           element: <BookPage />,
         },
       ],
@@ -63,6 +66,37 @@ export default function App() {
               <AdminPage />
             </PrivateRoute>,
         },
+        {
+          path: "dashboard",
+          element:
+            <PrivateRoute>
+              <AdminPage />
+            </PrivateRoute>,
+        },
+        {
+          path: "user",
+          element:
+            <PrivateRoute>
+              <ManageUserPage />
+            </PrivateRoute>
+          ,
+        },
+        {
+          path: "book",
+          element:
+            <PrivateRoute>
+              <MangeBookPage />
+            </PrivateRoute>
+          ,
+        },
+        {
+          path: "order",
+          element:
+            <PrivateRoute>
+              <MangeOrderPage />
+            </PrivateRoute>
+          ,
+        }
       ],
     },
 
@@ -78,7 +112,10 @@ export default function App() {
 
   return (
     <>
-      {isLoading === false || window.location.pathname === '/login' || window.location.pathname === '/register'
+      {isLoading === false
+        || window.location.pathname === '/login'
+        || window.location.pathname === '/register'
+        || window.location.pathname.startsWith('/book')
         ?
         <RouterProvider router={router} />
         :
