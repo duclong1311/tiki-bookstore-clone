@@ -73,3 +73,5 @@ export const deleteBook = (Id) => {
 export const getBookCategory = () => {
     return axios.get(`/api/v1/database/category`);
 }
+
+// Homepage

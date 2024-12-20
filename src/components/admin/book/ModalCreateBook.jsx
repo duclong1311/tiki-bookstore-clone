@@ -11,7 +11,7 @@ const getBase64 = (img, callback) => {
 };
 
 const ModalCreateBook = (props) => {
-    const { setIsModalOpen, isModalOpen } = props;
+    const { setIsModalOpen, isModalOpen, fetchListBook } = props;
 
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
@@ -73,18 +73,20 @@ const ModalCreateBook = (props) => {
 
     const onFinish = async (values) => {
         const { mainText, author, price, sold, quantity, category } = values;
-        if (thumbnailData && thumbnailData.length === 0) {
+
+        if (!thumbnailData || thumbnailData.length === 0) {
             notification.error({
                 message: 'Error',
                 description: 'Không có thumbnail sách'
-            })
+            });
             return;
         }
-        if (sliderData && sliderData.length === 0) {
+
+        if (!sliderData || sliderData.length === 0) {
             notification.error({
                 message: 'Error',
                 description: 'Không có slider sách'
-            })
+            });
             return;
         }
 
@@ -92,18 +94,22 @@ const ModalCreateBook = (props) => {
         const slider = sliderData.map(item => item.name);
 
         try {
-            const res = await createBook(thumbnail, slider, mainText, author, price, sold, quantity, category)
-            if (res && res.data) {
+            const response = await createBook(thumbnail, slider, mainText, author, price, sold, quantity, category);
+            if (response && response.data) {
                 message.success('Thêm mới sách thành công!');
             }
         } catch (error) {
-            message.error(error);
+            notification.error({
+                message: 'Có lỗi xảy ra',
+                description: error.message || error.response?.data?.message
+            });
         } finally {
             form.resetFields();
             setThumbnailData([]);
             setSliderData([]);
+            fetchListBook();
             setIsModalOpen(false);
-        }
+        };
     };
 
     const handleUploadFileThumbnail = async ({ file, onSuccess, onError }) => {

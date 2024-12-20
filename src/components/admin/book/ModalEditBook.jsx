@@ -1,15 +1,9 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useReducer, useState } from 'react';
 import { Button, Col, Form, Input, InputNumber, message, Modal, notification, Row, Select, Upload, Image, Divider } from 'antd';
 import { createBook, getBookCategory, updateBook, uploadBookImage } from '../../../services/api';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import { v4 as uuidv4 } from 'uuid';
 const baseUrl = import.meta.env.VITE_BACKEND_URL;
-
-const getBase64 = (img, callback) => {
-    const reader = new FileReader();
-    reader.addEventListener('load', () => callback(reader.result));
-    reader.readAsDataURL(img);
-};
 
 const ModalEditBook = (props) => {
     const { setIsModalOpen, isModalOpen, dataViewDetail, setDataViewDetail, fetchListBook } = props;
@@ -23,21 +17,9 @@ const ModalEditBook = (props) => {
     const [sliderData, setSliderData] = useState([]);
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
-    const [previewTitle, setPreviewTitle] = useState('');
-    const [initForm, setInitForm] = useState(null);
+    const [initForm, setInitForm] = useState('');
+    const [, forceUpdate] = useReducer(x => x + 1, 0);
 
-    useEffect(() => {
-        const fetchSelectCategory = async () => {
-            const res = await getBookCategory();
-            if (res && res.data && res.data.length > 0) {
-                const selectList = res.data.map(item => { return { label: item, value: item } });
-                if (selectList.length > 0)
-                    setSelectCategory(selectList);
-            }
-        };
-
-        fetchSelectCategory();
-    }, [])
 
     useEffect(() => {
         if (dataViewDetail?._id) {
@@ -72,7 +54,6 @@ const ModalEditBook = (props) => {
             setInitForm(initValues);
             setThumbnailData(arrThumbnail);
             setSliderData(arrSlider);
-
             form.setFieldsValue(initValues);
         }
 
@@ -80,6 +61,19 @@ const ModalEditBook = (props) => {
             form.resetFields();
         }
     }, [dataViewDetail]);
+
+    useEffect(() => {
+        const fetchSelectCategory = async () => {
+            const res = await getBookCategory();
+            if (res && res.data && res.data.length > 0) {
+                const selectList = res.data.map(item => { return { label: item, value: item } });
+                if (selectList.length > 0)
+                    setSelectCategory(selectList);
+            }
+        };
+
+        fetchSelectCategory();
+    }, [])
 
     const handleOk = () => {
         form.submit(onFinish);
@@ -101,6 +95,12 @@ const ModalEditBook = (props) => {
             message.error('Image must smaller than 2MB!');
         }
         return isJpgOrPng && isLt2M;
+    };
+
+    const getBase64 = (img, callback) => {
+        const reader = new FileReader();
+        reader.addEventListener('load', () => callback(reader.result));
+        reader.readAsDataURL(img);
     };
 
     const handleChange = (info, type) => {
@@ -184,7 +184,6 @@ const ModalEditBook = (props) => {
         }
     };
 
-
     const handlePreview = async (file) => {
         if (!file.url && !file.preview) {
             file.preview = await getImageBase64(file.originFileObj);
@@ -192,6 +191,16 @@ const ModalEditBook = (props) => {
         setPreviewImage(file.url || file.preview);
         setPreviewOpen(true);
     };
+
+    const handleRemoveFile = (file, type) => {
+        if (type === 'thumbnail') {
+            setThumbnailData([])
+        }
+        if (type === 'slider') {
+            const newSlider = sliderData.filter(x => x.uid !== file.uid);
+            setSliderData(newSlider);
+        }
+    }
 
     return (
         <>
@@ -207,6 +216,7 @@ const ModalEditBook = (props) => {
                     name="basic"
                     onFinish={onFinish}
                     form={form}
+                    initialValues={initForm}
                 >
                     <Row gutter={[8, 0]}>
                         <Col hidden>
@@ -311,7 +321,7 @@ const ModalEditBook = (props) => {
                                     beforeUpload={beforeUpload}
                                     onChange={handleChange}
                                     onPreview={handlePreview}
-                                    // fileList={thumbnailData}
+                                    onRemove={(file) => handleRemoveFile(file, "thumbnail")}
                                     defaultFileList={initForm?.thumbnail?.fileList ?? []}
                                 >
                                     <div>
@@ -338,7 +348,7 @@ const ModalEditBook = (props) => {
                                     beforeUpload={beforeUpload}
                                     onChange={(info) => handleChange(info, 'slider')}
                                     onPreview={handlePreview}
-                                    // fileList={sliderData}
+                                    onRemove={(file) => handleRemoveFile(file, "slider")}
                                     defaultFileList={initForm?.slider?.fileList ?? []}
                                 >
                                     <div>

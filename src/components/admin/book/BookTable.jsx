@@ -59,15 +59,18 @@ const BookTable = () => {
 
     // Handlers
     const handleDeleteBook = async (id) => {
-        // Placeholder for delete logic
-        const res = await deleteBook(id);
-        if (res)
-            message.success(`Book with ID: ${id} deleted.`);
-        else
+        try {
+            const res = await deleteBook(id);
+            if (res && res.data)
+                message.success(`Book with ID: ${id} deleted.`);
+        } catch (error) {
             notification.error({
                 message: 'Có lỗi xảy ra',
-                description: res.message,
+                description: error.message || error.response?.data?.message,
             });
+        } finally {
+            fetchListBook();
+        }
     };
 
     const handleEditBook = (record) => {
@@ -206,6 +209,7 @@ const BookTable = () => {
                 <ModalCreateBook
                     isModalOpen={isModalOpen}
                     setIsModalOpen={setIsModalOpen}
+                    fetchListBook={fetchListBook}
                 />
             )}
             {isModalOpen === 'edit' && (
