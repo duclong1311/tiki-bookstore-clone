@@ -93,7 +93,7 @@ const Header = () => {
                             }
                         </div>
                         <Divider type="vertical" style={{ borderLeft: '2px solid #ccc', height: '28px' }} />
-                        <div className="header-top__cart">
+                        <div className="header-top__cart" onClick={() => navigate('/order')}>
                             <Popover
                                 className='popover-carts'
                                 rootClassName='popover-carts'
@@ -117,7 +117,7 @@ const Header = () => {
                                                     })}
                                                 </div>
                                                 <div className='pop-cart-footer'>
-                                                    <button>Xem giỏ hàng</button>
+                                                    <button onClick={() => navigate('/order')}>Xem giỏ hàng</button>
                                                 </div>
                                             </div>
                                         </>
@@ -128,7 +128,6 @@ const Header = () => {
                                     <IoCartOutline style={{ fontSize: "32px" }} />
                                 </Badge>
                             </Popover>
-
                         </div>
                     </div>
                 </div>

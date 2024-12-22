@@ -1,7 +1,9 @@
+import ViewOrder from "../../../components/order/ViewOrder";
+
 const MangeOrderPage = () => {
     return (
         <div className="manage-order-page">
-            MangeOrderPage
+            <ViewOrder />
         </div>
     )
 }
