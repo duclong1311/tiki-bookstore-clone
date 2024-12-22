@@ -20,6 +20,7 @@ import LayoutAdmin from './LayoutAdmin';
 import ManageUserPage from './pages/admin/user';
 import MangeBookPage from './pages/admin/book';
 import MangeOrderPage from './pages/admin/order';
+import './styles/global.scss';
 
 export default function App() {
   const dispatch = useDispatch();

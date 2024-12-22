@@ -1,4 +1,4 @@
-import { Divider, Badge, Dropdown, message, notification, Avatar } from 'antd';
+import { Divider, Badge, Dropdown, message, notification, Avatar, Popover } from 'antd';
 import { TiTick } from "react-icons/ti";
 import { FaCarSide } from "react-icons/fa";
 import { MdCurrencyExchange } from "react-icons/md";
@@ -94,9 +94,41 @@ const Header = () => {
                         </div>
                         <Divider type="vertical" style={{ borderLeft: '2px solid #ccc', height: '28px' }} />
                         <div className="header-top__cart">
-                            <Badge count={carts?.length ?? 0} overflowCount={10} showZero>
-                                <IoCartOutline style={{ fontSize: "32px" }} />
-                            </Badge>
+                            <Popover
+                                className='popover-carts'
+                                rootClassName='popover-carts'
+                                placement="bottom"
+                                title={'Sản phẩm đã thêm'}
+                                content={
+                                    () => (
+                                        <>
+                                            <div className='pop-cart-body'>
+                                                <div className='pop-cart-content'>
+                                                    {carts?.map((book, index) => {
+                                                        return (
+                                                            <div className='book' key={`book-${index}`}>
+                                                                <img src={`${baseUrl}/images/book/${book?.detail?.thumbnail}`} />
+                                                                <div>{book?.detail?.mainText}</div>
+                                                                <div className='price'>
+                                                                    {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(book?.detail?.price ?? 0)}
+                                                                </div>
+                                                            </div>
+                                                        )
+                                                    })}
+                                                </div>
+                                                <div className='pop-cart-footer'>
+                                                    <button>Xem giỏ hàng</button>
+                                                </div>
+                                            </div>
+                                        </>
+                                    )
+                                }
+                            >
+                                <Badge count={carts?.length ?? 0} overflowCount={10} showZero>
+                                    <IoCartOutline style={{ fontSize: "32px" }} />
+                                </Badge>
+                            </Popover>
+
                         </div>
                     </div>
                 </div>
