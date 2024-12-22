@@ -7,19 +7,19 @@ import { BsCartPlus } from 'react-icons/bs';
 import { useRef, useState } from 'react';
 import ModalGallery from './ModalGallery';
 import BookLoader from './BookLoader';
+import { useDispatch } from 'react-redux';
+import { doAddBookAction } from '../../redux/order/orderSlice';
 const baseUrl = import.meta.env.VITE_BACKEND_URL;
 
 const ViewDetail = (props) => {
     const { dataBook } = props;
 
     const images = dataBook?.items ?? [];
-
-    console.log(images);
-
     const [isOpenModalGallery, setIsOpenModalGallery] = useState(false);
     const [currentIndex, setCurrentIndex] = useState(1);
     const [currentQuantity, setCurrentQuantity] = useState(1)
     const refGallery = useRef(null);
+    const dispatch = useDispatch();
 
     const handleOnClickImage = () => {
         setIsOpenModalGallery(true);
@@ -43,6 +43,15 @@ const ViewDetail = (props) => {
                 setCurrentQuantity(+value);
             }
         }
+    }
+
+    const handleAddToCart = (quantity, bookData) => {
+        const payload = {
+            quantity,
+            _id: bookData._id,
+            detail: bookData
+        };
+        dispatch(doAddBookAction(payload));
     }
 
     return (
@@ -122,7 +131,7 @@ const ViewDetail = (props) => {
                                     <div className='buy'>
                                         <button
                                             className='cart'
-                                        // onClick={() => handleAddToCart(currentQuantity, dataBook)}
+                                            onClick={() => handleAddToCart(currentQuantity, dataBook)}
                                         >
                                             <BsCartPlus className='icon-cart' />
                                             <span>Thêm vào giỏ hàng</span>

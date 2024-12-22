@@ -18,8 +18,6 @@ const ModalEditBook = (props) => {
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
     const [initForm, setInitForm] = useState('');
-    const [, forceUpdate] = useReducer(x => x + 1, 0);
-
 
     useEffect(() => {
         if (dataViewDetail?._id) {

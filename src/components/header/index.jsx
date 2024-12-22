@@ -23,6 +23,7 @@ const Header = () => {
     const isLogin = useSelector(state => state.account.isAuthenticated);
     const userInfor = useSelector(state => state.account.user);
     const dispatch = useDispatch();
+    const carts = useSelector(state => state.order.carts);
 
     const handleLogout = async () => {
         const res = await callLogout();
@@ -38,8 +39,6 @@ const Header = () => {
             });
         }
     }
-
-    console.log(userInfor);
 
     let items = [
         {
@@ -95,7 +94,7 @@ const Header = () => {
                         </div>
                         <Divider type="vertical" style={{ borderLeft: '2px solid #ccc', height: '28px' }} />
                         <div className="header-top__cart">
-                            <Badge count={99} overflowCount={10}>
+                            <Badge count={carts?.length ?? 0} overflowCount={10} showZero>
                                 <IoCartOutline style={{ fontSize: "32px" }} />
                             </Badge>
                         </div>
