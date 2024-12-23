@@ -21,6 +21,7 @@ import ManageUserPage from './pages/admin/user';
 import MangeBookPage from './pages/admin/book';
 import MangeOrderPage from './pages/admin/order';
 import './styles/global.scss';
+import OrderHistory from './components/order/OrderHistory';
 
 export default function App() {
   const dispatch = useDispatch();
@@ -56,6 +57,10 @@ export default function App() {
         {
           path: "order",
           element: <MangeOrderPage />,
+        },
+        {
+          path: "order-history",
+          element: <OrderHistory />,
         },
       ],
     },

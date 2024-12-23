@@ -2,19 +2,25 @@ import { DeleteTwoTone } from "@ant-design/icons";
 import { Col, Divider, Empty, InputNumber, Row } from "antd";
 import './ViewOrder.scss'
 import { useDispatch, useSelector } from "react-redux";
+import { doDeleteBookAction, doUpdateCartAction } from "../../redux/order/orderSlice";
+import { useState } from "react";
+import { totalPrice } from "../../services/totalPrice";
 const baseUrl = import.meta.env.VITE_BACKEND_URL;
 
-const ViewOrder = () => {
+const ViewOrder = (props) => {
+    const { setCurrentStep } = props;
 
     const dispatch = useDispatch();
     const carts = useSelector((state) => state.order.carts);
 
-    console.log(carts);
-
-    const totalPrice = () => {
-        if (carts && carts.length > 0) {
-            const itemTotal = carts.map((item) => item.quantity * item.detail.price);
-            return itemTotal.reduce((total, num) => total + num, 0);
+    const handleOnChangeInput = (value, book) => {
+        if (!value || value < 1) return;
+        if (!isNaN(value)) {
+            dispatch(doUpdateCartAction({
+                _id: book._id,
+                quantity: value,
+                detail: book.detail
+            }));
         }
     }
 
@@ -27,23 +33,23 @@ const ViewOrder = () => {
                             carts.map((item, index) => (
                                 <div className='order-book' key={`item-${index}`}>
                                     <div className='book-content'>
-                                        <img src={`${baseUrl}/images/book/${item.detail.thumbnail}`} />
+                                        <img src={`${baseUrl}/images/book/${item?.detail?.thumbnail}`} />
                                         <div className='title'>
                                             {item?.detail?.mainText}
                                         </div>
                                         <div className='price'>
-                                            {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.detail.price)}
+                                            {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item?.detail?.price)}
                                         </div>
                                     </div>
                                     <div className='action'>
                                         <div className='quantity'>
-                                            <InputNumber value={item.quantity} />
+                                            <InputNumber value={item.quantity} onChange={(value) => handleOnChangeInput(value, item)} />
                                         </div>
                                         <div className='sum'>
-                                            Tổng: {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.detail.price * item.quantity)}
+                                            Tổng: {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item?.detail?.price * item.quantity)}
                                         </div>
                                         <DeleteTwoTone
-                                            // onClick={() => dispatch()}
+                                            onClick={() => dispatch(doDeleteBookAction({ _id: item._id }))}
                                             style={{ cursor: "pointer" }}
                                             twoToneColor="#eb2f96"
                                         />
@@ -63,18 +69,19 @@ const ViewOrder = () => {
                             <div className='calculate'>
                                 <span>Tạm tính</span>
                                 <span>
-                                    {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(totalPrice())}
+                                    {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(totalPrice(carts))}
                                 </span>
                             </div>
                             <Divider style={{ margin: "10px 0" }} />
                             <div className='calculate'>
                                 <span> Tổng tiền</span>
                                 <span className='sum-final'>
-                                    {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(totalPrice())}
+                                    {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(totalPrice(carts))}
                                 </span>
                             </div>
                             <Divider style={{ margin: "10px 0" }} />
                             <button
+                                onClick={() => setCurrentStep(1)}
                             >
                                 Mua Hàng
                             </button>
