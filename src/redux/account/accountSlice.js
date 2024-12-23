@@ -39,10 +39,20 @@ export const accountSlice = createSlice({
                 id: ""
             }
 
+        },
+        doUpdateUserInfoAction: (state, action) => {
+            state.user.avatar = action.payload.avatar;
+            state.user.phone = action.payload.phone;
+            state.user.fullName = action.payload.fullName;
+        },
+
+        doUploadAvatarAction: (state, action) => {
+            state.tempAvatar = action.payload.avatar
         }
+
     },
 });
 
-export const { doLoginAction, doLogoutAction } = accountSlice.actions;
+export const { doLoginAction, doLogoutAction, doUpdateUserInfoAction, doUploadAvatarAction } = accountSlice.actions;
 
 export default accountSlice.reducer;

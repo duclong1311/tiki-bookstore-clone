@@ -15,6 +15,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { doLogoutAction } from '../../redux/account/accountSlice';
 import { UserOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import ManageAccount from '../account/ManageAccount';
 const baseUrl = import.meta.env.VITE_BACKEND_URL;
 
 const Header = () => {
@@ -24,6 +26,7 @@ const Header = () => {
     const userInfor = useSelector(state => state.account.user);
     const dispatch = useDispatch();
     const carts = useSelector(state => state.order.carts);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const handleLogout = async () => {
         const res = await callLogout();
@@ -47,8 +50,13 @@ const Header = () => {
             disabled: userInfor?.role === 'USER' ? true : false,
         },
         {
+            label: <Link to="/history">Lịch sử mua hàng</Link>,
+            key: 'history',
+        },
+        {
             key: 'account',
-            label: <label>Quản lý tài khoản</label>,
+            label: <label style={{ cursor: 'pointer' }}>Quản lý tài khoản</label>,
+            onClick: () => setIsModalOpen(true)
         },
         {
             key: 'logout',
@@ -167,6 +175,10 @@ const Header = () => {
                 </div>
                 <Divider />
             </div>
+            <ManageAccount
+                isModalOpen={isModalOpen}
+                setIsModalOpen={setIsModalOpen}
+            />
         </>
     )
 }

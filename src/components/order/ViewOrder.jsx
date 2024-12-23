@@ -69,14 +69,14 @@ const ViewOrder = (props) => {
                             <div className='calculate'>
                                 <span>Tạm tính</span>
                                 <span>
-                                    {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(totalPrice(carts))}
+                                    {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(totalPrice(carts) || 0)}
                                 </span>
                             </div>
                             <Divider style={{ margin: "10px 0" }} />
                             <div className='calculate'>
                                 <span> Tổng tiền</span>
                                 <span className='sum-final'>
-                                    {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(totalPrice(carts))}
+                                    {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(totalPrice(carts) || 0)}
                                 </span>
                             </div>
                             <Divider style={{ margin: "10px 0" }} />
