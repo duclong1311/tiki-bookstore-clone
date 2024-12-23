@@ -22,6 +22,7 @@ import MangeBookPage from './pages/admin/book';
 import MangeOrderPage from './pages/admin/order';
 import './styles/global.scss';
 import OrderHistory from './components/order/OrderHistory';
+import MangeOrder from './components/admin/order/ManageOrder';
 
 export default function App() {
   const dispatch = useDispatch();
@@ -56,11 +57,17 @@ export default function App() {
         },
         {
           path: "order",
-          element: <MangeOrderPage />,
+          element:
+            <PrivateRoute>
+              <MangeOrderPage />
+            </PrivateRoute>
         },
         {
           path: "order-history",
-          element: <OrderHistory />,
+          element:
+            <PrivateRoute>
+              <OrderHistory />
+            </PrivateRoute>
         },
       ],
     },
@@ -103,7 +110,7 @@ export default function App() {
           path: "order",
           element:
             <PrivateRoute>
-              <MangeOrderPage />
+              <MangeOrder />
             </PrivateRoute>
           ,
         }

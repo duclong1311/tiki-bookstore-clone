@@ -82,6 +82,10 @@ export const getBookById = (id) => {
 
 // Orders & cart
 
+export const getListOrder = (query) => {
+    return axios.get(`/api/v1/order?${query}`);
+}
+
 export const createOrder = (data) => {
     return axios.post(`/api/v1/order`, data);
 }

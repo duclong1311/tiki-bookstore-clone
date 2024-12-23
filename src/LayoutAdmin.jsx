@@ -33,9 +33,8 @@ const items = [
     ]),
     getItem('Mange Book', 'sub2', <BookOutlined />, [
         getItem('CRUD Book', 'book'),
-        getItem('Team 2', '8'),
     ]),
-    getItem('Mange Order', '9', <FileOutlined />),
+    getItem('Mange Order', 'order', <FileOutlined />),
 ];
 
 
