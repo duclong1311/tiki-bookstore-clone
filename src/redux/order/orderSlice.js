@@ -45,8 +45,6 @@ export const orderSlice = createSlice({
             }
 
             state.carts = orders;
-
-            console.log('check orders', state.carts);
         },
         doDeleteBookAction: (state, action) => {
             let orders = [...state.carts];
@@ -55,10 +53,14 @@ export const orderSlice = createSlice({
 
             state.carts = filtered;
             message.success("Xóa sản phẩm thành công");
+        },
+        doClearCartAction: (state, action) => {
+            let order = [];
+            state.carts = order;
         }
     },
 });
 
-export const { doAddBookAction, doDeleteBookAction, doUpdateCartAction } = orderSlice.actions;
+export const { doAddBookAction, doDeleteBookAction, doUpdateCartAction, doClearCartAction } = orderSlice.actions;
 
 export default orderSlice.reducer;

@@ -79,3 +79,13 @@ export const getBookCategory = () => {
 export const getBookById = (id) => {
     return axios.get(`/api/v1/book/${id}`);
 }
+
+// Orders & cart
+
+export const createOrder = (data) => {
+    return axios.post(`/api/v1/order`, data);
+}
+
+export const getOrderHistory = () => {
+    return axios.get(`/api/v1/history`);
+}

@@ -1,19 +1,56 @@
 import { DeleteTwoTone } from "@ant-design/icons";
-import { Col, Divider, InputNumber, Radio, Row } from "antd";
+import { Col, Divider, InputNumber, message, notification, Radio, Row } from "antd";
 import TextArea from "antd/es/input/TextArea";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { totalPrice } from "../../services/totalPrice";
+import { createOrder } from "../../services/api";
+import { doClearCartAction } from "../../redux/order/orderSlice";
+import { useState } from "react";
 const baseUrl = import.meta.env.VITE_BACKEND_URL;
 
 const Payment = (props) => {
     const { setCurrentStep } = props;
 
     const carts = useSelector((state) => state.order.carts);
+    const userInfo = useSelector((state) => state.account.user);
+    const dispatch = useDispatch();
 
-    const handlePlaceOrder = () => {
-        console.log('....');
-        setCurrentStep(2);
-    }
+    const [address, setAddress] = useState('');
+
+    const handlePlaceOrder = async () => {
+        try {
+            const data = {
+                name: userInfo?.fullName,
+                address: address,
+                phone: userInfo?.phone,
+                totalPrice: totalPrice(carts),
+                detail: carts.map(({ detail, quantity, _id }) => ({
+                    bookName: detail?.mainText,
+                    quantity,
+                    _id
+                }))
+            };
+
+            const res = await createOrder(data);
+
+            if (res?.error) {
+                notification.error({
+                    message: 'Có lỗi xảy ra',
+                    description: res.message || 'Vui lòng thử lại.'
+                });
+            } else {
+                message.success('Đặt hàng thành công!');
+                setCurrentStep(2);
+                dispatch(doClearCartAction());
+            }
+        } catch (error) {
+            console.error("Error placing order:", error);
+            notification.error({
+                message: 'Có lỗi xảy ra',
+                description: 'Đã xảy ra lỗi không mong muốn. Vui lòng thử lại.'
+            });
+        }
+    };
 
     return (
         <Row gutter={[20, 20]}>
@@ -56,8 +93,13 @@ const Payment = (props) => {
                         </div>
                         <Divider style={{ margin: "10px 0" }} />
                         <div className='address'>
-                            <div> Địa chỉ nhận hàng</div>
-                            <TextArea rows={4} />
+                            <div> Địa chỉ cụ thể</div>
+                            <TextArea
+                                rows={4}
+                                value={address}
+                                onChange={(e) => setAddress(e.target.value)}
+                                rules={[{ required: true, message: 'Địa chỉ không được để trống!' }]}
+                            />
                         </div>
                     </div>
                     <div className='calculate'>
