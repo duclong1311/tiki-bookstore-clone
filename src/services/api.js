@@ -90,6 +90,8 @@ export const getOrderHistory = () => {
     return axios.get(`/api/v1/history`);
 }
 
+// Account
+
 export const callUpdateAvatar = (fileImg) => {
     const bodyFormData = new FormData();
     bodyFormData.append('fileImg', fileImg);
@@ -107,5 +109,11 @@ export const callUpdateAvatar = (fileImg) => {
 export const callUpdateUserInfo = (_id, phone, fullName, avatar) => {
     return axios.put(`/api/v1/user`, {
         _id, phone, fullName, avatar
+    })
+}
+
+export const callUpdatePassword = (email, oldpass, newpass) => {
+    return axios.post(`/api/v1/user/change-password`, {
+        email, oldpass, newpass
     })
 }

@@ -1,5 +1,6 @@
 import { Modal, Tabs } from "antd";
 import UserInfo from "./UserInfo";
+import ChangePassword from "./ChangePassword";
 
 const ManageAccount = (props) => {
     const { isModalOpen, setIsModalOpen } = props;
@@ -10,11 +11,11 @@ const ManageAccount = (props) => {
             label: `Cập nhật thông tin`,
             children: <UserInfo />,
         },
-        // {
-        //     key: 'password',
-        //     label: `Đổi mật khẩu`,
-        //     children: <ChangePassword />,
-        // },
+        {
+            key: 'password',
+            label: `Đổi mật khẩu`,
+            children: <ChangePassword />,
+        },
 
     ];
 
