@@ -63,6 +63,11 @@ const BookTable = () => {
             const res = await deleteBook(id);
             if (res && res.data)
                 message.success(`Book with ID: ${id} deleted.`);
+            else
+                notification.error({
+                    message: 'Có lỗi xảy ra',
+                    description: res.message,
+                });
         } catch (error) {
             notification.error({
                 message: 'Có lỗi xảy ra',

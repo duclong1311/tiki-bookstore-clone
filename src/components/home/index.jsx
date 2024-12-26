@@ -3,8 +3,10 @@ import { Row, Col, Form, Checkbox, Divider, InputNumber, Button, Rate, Tabs, Pag
 import { useEffect, useState } from 'react';
 import { getBookCategory, getBookWithPaginate } from '../../services/api';
 import './home.scss';
-import { useNavigate } from 'react-router';
+import { useNavigate, useOutletContext } from 'react-router';
 const Home = () => {
+
+    const [searchTerm, setSearchTerm] = useOutletContext();
 
     const [listCategory, setListCategory] = useState([]);
 
@@ -35,7 +37,7 @@ const Home = () => {
 
     useEffect(() => {
         fetchBook();
-    }, [current, pageSize, filter, sortQuery]);
+    }, [current, pageSize, filter, sortQuery, searchTerm]);
 
     const fetchBook = async () => {
         setIsLoading(true)
@@ -45,6 +47,9 @@ const Home = () => {
         }
         if (sortQuery) {
             query += `&${sortQuery}`;
+        }
+        if (searchTerm) {
+            query += `&mainText=/${searchTerm}/i`;
         }
 
         const res = await getBookWithPaginate(query);
@@ -167,7 +172,14 @@ const Home = () => {
                                 <span> <FilterTwoTone />
                                     <span style={{ fontWeight: 500 }}> Bộ lọc tìm kiếm</span>
                                 </span>
-                                <ReloadOutlined title="Reset" onClick={() => form.resetFields()} />
+                                <ReloadOutlined
+                                    title="Reset"
+                                    onClick={() => {
+                                        form.resetFields();
+                                        setFilter('');
+                                        setSearchTerm('');
+                                    }}
+                                />
                             </div>
                             <Divider />
                             <Form

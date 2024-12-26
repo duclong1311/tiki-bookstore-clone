@@ -53,7 +53,7 @@ const Payment = (props) => {
     };
 
     return (
-        <Row gutter={[20, 20]}>
+        <Row gutter={[20, 20]} style={{ height: 'calc(100vh - 290px)' }}>
             <Col md={16} xs={24}>
                 {carts && carts.length > 0 &&
                     carts.map((item, index) => (

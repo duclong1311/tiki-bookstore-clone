@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     FileOutlined,
     PieChartOutlined,
@@ -14,6 +14,7 @@ import Footer from "./components/footer";
 import { useDispatch, useSelector } from 'react-redux';
 import { callLogout } from './services/api';
 import { doLogoutAction } from './redux/account/accountSlice';
+import ManageAccount from './components/account/ManageAccount';
 const baseUrl = import.meta.env.VITE_BACKEND_URL;
 
 const { Header, Content, Sider } = Layout;
@@ -37,15 +38,15 @@ const items = [
     getItem('Mange Order', 'order', <FileOutlined />),
 ];
 
-
-
 const LayoutAdmin = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const userInfor = useSelector(state => state.account.user);
 
     const [collapsed, setCollapsed] = useState(false);
-    const [pageUrl, setPageUrl] = useState('/');
+    const [activeMenu, setActiveMenu] = useState('dashboard');
+    const [pageUrl, setPageUrl] = useState('Dash Board');
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const {
         token: { colorBgContainer, borderRadiusLG },
@@ -70,10 +71,11 @@ const LayoutAdmin = () => {
         {
             label: <label>Quản lý tài khoản</label>,
             key: 'account',
+            onClick: () => setIsModalOpen(true)
         },
         {
             key: 'homepage',
-            label: <Link to="/" >Trang chủ</Link>,
+            label: <Link to="/">Trang chủ</Link>,
         },
         {
             label: <label >Đăng xuất</label>,
@@ -96,10 +98,11 @@ const LayoutAdmin = () => {
                 </div>
                 <Menu
                     theme="dark"
-                    defaultSelectedKeys={['dashboard']}
+                    defaultSelectedKeys={pageUrl}
+                    activeKey={activeMenu}
                     mode="inline"
                     items={items}
-                    onSelect={({ key }) => navigate(`/admin/${key}`)}
+                    onSelect={({ key }) => { navigate(`/admin/${key}`); setPageUrl(key); }}
                 />
             </Sider>
             <Layout >
@@ -137,10 +140,11 @@ const LayoutAdmin = () => {
                             margin: '16px 0',
                         }}
                         items={[
-                            { title: 'Home' },
-                            { title: 'About' },
+                            { title: 'Admin' },
+                            { title: pageUrl },
                         ]}
                     />
+
                     <div
                         style={{
                             padding: 24,
@@ -153,6 +157,10 @@ const LayoutAdmin = () => {
                     </div>
                 </Content>
                 <Footer />
+                <ManageAccount
+                    isModalOpen={isModalOpen}
+                    setIsModalOpen={setIsModalOpen}
+                />
             </Layout>
         </Layout>
     );

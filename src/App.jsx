@@ -11,7 +11,7 @@ import BookPage from './pages/book';
 import RegisterPage from './pages/register';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAccount } from './services/api';
-import { doLoginAction } from './redux/account/accountSlice';
+import { doGetAccountAction, doLoginAction } from './redux/account/accountSlice';
 import LoadingPage from './pages/loading';
 import ErrorPage from './pages/error';
 import AdminPage from './pages/admin';
@@ -28,15 +28,17 @@ export default function App() {
   const dispatch = useDispatch();
   const isLoading = useSelector(state => state.account.isLoading);
 
+
   useEffect(() => {
     const getAccountData = async () => {
       if (window.location.pathname === '/login' || window.location.pathname === '/register')
         return;
       const res = await getAccount();
       if (res && res.data) {
-        dispatch(doLoginAction(res.data));
+        dispatch(doGetAccountAction(res.data));
       }
     }
+
     getAccountData();
   }, []);
 

@@ -1,4 +1,4 @@
-import { Divider, Badge, Dropdown, message, notification, Avatar, Popover } from 'antd';
+import { Divider, Badge, Dropdown, message, notification, Avatar, Popover, Empty } from 'antd';
 import { TiTick } from "react-icons/ti";
 import { FaCarSide } from "react-icons/fa";
 import { MdCurrencyExchange } from "react-icons/md";
@@ -15,18 +15,18 @@ import { useDispatch, useSelector } from 'react-redux';
 import { doLogoutAction } from '../../redux/account/accountSlice';
 import { UserOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ManageAccount from '../account/ManageAccount';
 const baseUrl = import.meta.env.VITE_BACKEND_URL;
 
-const Header = () => {
-    const navigate = useNavigate();
+const Header = (props) => {
 
+    const navigate = useNavigate();
     const isLogin = useSelector(state => state.account.isAuthenticated);
-    const userInfor = useSelector(state => state.account.user);
     const dispatch = useDispatch();
     const carts = useSelector(state => state.order.carts);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const userInfo = useSelector(state => state.account.user);
 
     const handleLogout = async () => {
         const res = await callLogout();
@@ -43,11 +43,13 @@ const Header = () => {
         }
     }
 
+    console.log(userInfo);
+
     let items = [
         {
             key: 'adminPage',
             label: <Link to="/admin" >Trang quản trị</Link>,
-            disabled: userInfor?.role === 'USER' ? true : false,
+            disabled: userInfo?.role === 'USER' ? true : false,
         },
         {
             label: <Link to="/history">Lịch sử mua hàng</Link>,
@@ -72,42 +74,45 @@ const Header = () => {
             <div className="header-container">
                 <div className="header-top">
                     <div className="header-top__logo">
-                        <IoLogoReact />
+                        <IoLogoReact style={{ cursor: 'pointer', color: 'rgb(11, 116, 229)' }} onClick={() => navigate('/')} />
                     </div>
                     <div className="header-top__search">
                         <SlMagnifier style={{ color: '#ccc', paddingRight: '5px', fontSize: '24px' }} />
-                        <input type="text" class="header-top__search-input" placeholder="Giá siêu rẻ" />
+                        <input type="text" class="header-top__search-input" placeholder="Giá siêu rẻ" onChange={(e) => props.setSearchTerm(e.target.value)} />
                         <Divider type="vertical" />
                         <button class="header-top__search-button">Tìm kiếm</button>
                     </div>
                     <div className='header-top__right'>
-                        <div className="header-top__account">
+                        <div className="header-top__account" style={{ cursor: 'pointer' }}>
                             {isLogin ?
                                 <>
                                     <Avatar
                                         size="large"
                                         icon={<UserOutlined />}
-                                        src={`${baseUrl}/images/avatar/${userInfor?.avatar}`}
-                                        style={{ fontSize: "32px", marginLeft: '5px' }}
+                                        src={`${baseUrl}/images/avatar/${userInfo?.avatar}`}
+                                        style={{ fontSize: "32px", marginLeft: '5px', cursor: 'context-menu' }}
                                     />
-                                    <Dropdown menu={{ items }} trigger={['click']}>
+                                    <Dropdown menu={{ items }} trigger={['click']} style={{ cursor: 'pointer' }}>
                                         <a onClick={(e) => e.preventDefault()}>
-                                            {`${userInfor?.fullName}`}
+                                            {`${userInfo?.fullName}`}
                                         </a>
                                     </Dropdown>
                                 </>
                                 :
-                                <span><UserOutlined style={{ fontSize: "32px", marginRight: '5px' }} />Tài khoản</span>
+                                <span onClick={() => navigate('/login')}>
+                                    <UserOutlined style={{ fontSize: "32px", marginRight: '5px', cursor: 'pointer' }} />
+                                    Tài khoản
+                                </span>
                             }
                         </div>
                         <Divider type="vertical" style={{ borderLeft: '2px solid #ccc', height: '28px' }} />
-                        <div className="header-top__cart" onClick={() => navigate('/order')}>
+                        <div className="header-top__cart" onClick={() => navigate('/order')} style={{ cursor: 'pointer' }}>
                             <Popover
                                 className='popover-carts'
                                 rootClassName='popover-carts'
                                 placement="bottom"
                                 title={'Sản phẩm đã thêm'}
-                                content={
+                                content={carts.length > 0 ?
                                     () => (
                                         <>
                                             <div className='pop-cart-body'>
@@ -116,7 +121,7 @@ const Header = () => {
                                                         return (
                                                             <div className='book' key={`book-${index}`}>
                                                                 <img src={`${baseUrl}/images/book/${book?.detail?.thumbnail}`} />
-                                                                <div>{book?.detail?.mainText}</div>
+                                                                <div className='title'>{book?.detail?.mainText}</div>
                                                                 <div className='price'>
                                                                     {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(book?.detail?.price ?? 0)}
                                                                 </div>
@@ -130,10 +135,12 @@ const Header = () => {
                                             </div>
                                         </>
                                     )
+                                    :
+                                    <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={'Không có sản phẩm nào'} />
                                 }
                             >
                                 <Badge count={carts?.length ?? 0} overflowCount={10} showZero>
-                                    <IoCartOutline style={{ fontSize: "32px" }} />
+                                    <IoCartOutline style={{ fontSize: "32px", color: 'rgb(11, 116, 229)' }} />
                                 </Badge>
                             </Popover>
                         </div>
@@ -144,36 +151,35 @@ const Header = () => {
                     Cam kết
                     <Divider type="vertical" style={{ borderLeft: '2px solid #ccc', height: '28px' }} />
                     <div className='header-bottom__commit'>
-                        <TiTick style={{ fontSize: "24px" }} />
-                        <span>100% hàng thật</span>
+                        <TiTick style={{ fontSize: "24px", color: 'rgb(11, 116, 229)', cursor: 'default' }} />
+                        <a>100% hàng thật</a>
                     </div>
                     <Divider type="vertical" style={{ borderLeft: '2px solid #ccc', height: '28px' }} />
                     <div className='header-bottom__commit'>
-                        <FaCarSide style={{ fontSize: "24px" }} />
+                        <FaCarSide style={{ fontSize: "24px", color: 'rgb(11, 116, 229)' }} />
                         <span>Freeship mọi đơn</span>
                     </div>
                     <Divider type="vertical" style={{ borderLeft: '2px solid #ccc', height: '28px' }} />
                     <div className='header-bottom__commit'>
-                        <MdCurrencyExchange style={{ fontSize: "24px" }} />
+                        <MdCurrencyExchange style={{ fontSize: "24px", color: 'rgb(11, 116, 229)' }} />
                         <span>Hoàn 200% nếu hàng giả</span>
                     </div>
                     <Divider type="vertical" style={{ borderLeft: '2px solid #ccc', height: '28px' }} />
                     <div className='header-bottom__commit'>
-                        <FaBox style={{ fontSize: "24px" }} />
+                        <FaBox style={{ fontSize: "24px", color: 'rgb(11, 116, 229)' }} />
                         <span>30 ngày đổi trả</span>
                     </div>
                     <Divider type="vertical" style={{ borderLeft: '2px solid #ccc', height: '28px' }} />
                     <div className='header-bottom__commit'>
-                        <FaShippingFast style={{ fontSize: "24px" }} />
+                        <FaShippingFast style={{ fontSize: "24px", color: 'rgb(11, 116, 229)' }} />
                         <span>Giao nhanh 2h</span>
                     </div>
                     <Divider type="vertical" style={{ borderLeft: '2px solid #ccc', height: '28px' }} />
                     <div className='header-bottom__commit'>
-                        <FaTags style={{ fontSize: "24px" }} />
+                        <FaTags style={{ fontSize: "24px", color: 'rgb(11, 116, 229)' }} />
                         <span>Giá siêu rẻ</span>
                     </div>
                 </div>
-                <Divider />
             </div>
             <ManageAccount
                 isModalOpen={isModalOpen}

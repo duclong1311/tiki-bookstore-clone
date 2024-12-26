@@ -25,7 +25,7 @@ const ViewOrder = (props) => {
     }
 
     return (
-        <div style={{ background: '#efefef', padding: "20px 0" }}>
+        <div style={{ background: '#efefef', padding: "20px 0", height: 'calc(100vh - 290px)' }}>
             <div className="order-container" style={{ maxWidth: 1440, margin: '0 auto' }}>
                 <Row gutter={[20, 20]}>
                     <Col md={18} xs={24}>
@@ -82,6 +82,7 @@ const ViewOrder = (props) => {
                             <Divider style={{ margin: "10px 0" }} />
                             <button
                                 onClick={() => setCurrentStep(1)}
+                                disabled={carts?.length === 0 ? true : false}
                             >
                                 Mua Hàng
                             </button>

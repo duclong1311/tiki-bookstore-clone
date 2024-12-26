@@ -1,4 +1,6 @@
 .order-container {
+    box-sizing: border-box;
+    
     .order-book {
         display: flex;
         gap: 30px;
