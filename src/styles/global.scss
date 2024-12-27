@@ -25,6 +25,10 @@
                 .price {
                     color: #ee4d2d;
                     margin-left: auto;
+
+                    &:hover {
+                        color: #e1654c;
+                    }
                 }
             }
         }
@@ -41,10 +45,14 @@
                 box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .03);
                 cursor: pointer;
                 border-radius: 3px;
-
                 font-size: 16px;
                 height: 40px;
                 padding: 0 20px;
+
+                &:hover {
+                    background-color: #e1654c;
+                }
+
             }
         }
     }
