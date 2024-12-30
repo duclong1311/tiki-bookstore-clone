@@ -74,7 +74,10 @@ const Header = (props) => {
             <div className="header-container">
                 <div className="header-top">
                     <div className="header-top__logo">
-                        <IoLogoReact style={{ cursor: 'pointer', color: 'rgb(11, 116, 229)' }} onClick={() => navigate('/')} />
+                        <IoLogoReact
+                            onClick={() => navigate('/')}
+                            className="header-logo"
+                        />
                     </div>
                     <div className="header-top__search">
                         <SlMagnifier style={{ color: '#ccc', paddingRight: '5px', fontSize: '24px' }} />

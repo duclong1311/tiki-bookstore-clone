@@ -2,7 +2,7 @@ import { Breadcrumb, Col, Divider, Rate, Row } from 'antd';
 import './ViewDetail.scss';
 import ImageGallery from "react-image-gallery";
 import { HomeOutlined, MinusOutlined, PlusOutlined } from '@ant-design/icons';
-import { Link } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { BsCartPlus } from 'react-icons/bs';
 import { useRef, useState } from 'react';
 import ModalGallery from './ModalGallery';
@@ -20,6 +20,7 @@ const ViewDetail = (props) => {
     const [currentQuantity, setCurrentQuantity] = useState(1)
     const refGallery = useRef(null);
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const handleOnClickImage = () => {
         setIsOpenModalGallery(true);
@@ -54,6 +55,16 @@ const ViewDetail = (props) => {
         dispatch(doAddBookAction(payload));
     }
 
+    const handleBuyNow = (quantity, bookData) => {
+        const payload = {
+            quantity,
+            _id: bookData._id,
+            detail: bookData
+        };
+        dispatch(doAddBookAction(payload));
+        navigate('/order');
+    }
+
     return (
         <div style={{ background: '#efefef', padding: "20px 0" }}>
             <div className='view-detail-book' style={{ maxWidth: 1440, margin: '0 auto', minHeight: "calc(100vh - 150px)" }}>
@@ -80,11 +91,11 @@ const ViewDetail = (props) => {
                                 <ImageGallery
                                     ref={refGallery}
                                     items={images}
-                                    showPlayButton={false} //hide play button
-                                    showFullscreenButton={false} //hide fullscreen button
-                                    renderLeftNav={() => <></>} //left arrow === <> </>
-                                    renderRightNav={() => <></>}//right arrow === <> </>
-                                    slideOnThumbnailOver={true}  //onHover => auto scroll images
+                                    showPlayButton={false}
+                                    showFullscreenButton={false}
+                                    renderLeftNav={() => <></>}
+                                    renderRightNav={() => <></>}
+                                    slideOnThumbnailOver={true}
                                     onClick={() => handleOnClickImage()}
                                 />
                             </Col>
@@ -93,10 +104,10 @@ const ViewDetail = (props) => {
                                     <ImageGallery
                                         ref={refGallery}
                                         items={images}
-                                        showPlayButton={false} //hide play button
-                                        showFullscreenButton={false} //hide fullscreen button
-                                        renderLeftNav={() => <></>} //left arrow === <> </>
-                                        renderRightNav={() => <></>}//right arrow === <> </>
+                                        showPlayButton={false}
+                                        showFullscreenButton={false}
+                                        renderLeftNav={() => <></>}
+                                        renderRightNav={() => <></>}
                                         showThumbnails={false}
                                     />
                                 </Col>
@@ -138,7 +149,7 @@ const ViewDetail = (props) => {
                                         </button>
                                         <button
                                             className='now'
-                                        // onClick={() => handleBuyNow(currentQuantity, dataBook)}
+                                            onClick={() => handleBuyNow(currentQuantity, dataBook)}
                                         >Mua ngay</button>
                                     </div>
                                 </Col>

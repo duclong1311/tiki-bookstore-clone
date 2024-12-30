@@ -26,6 +26,17 @@
             font-size: 60px;
             color: rgb(0, 126, 253);
             margin-right: 50px;
+
+            .header-logo {
+                cursor: pointer;
+                color: rgb(11, 116, 229);
+
+                &:hover {
+                    -webkit-animation: spin 4s infinite linear;
+
+                }
+            }
+
         }
 
         .header-top__search {
@@ -97,5 +108,15 @@
             align-items: center;
             gap: 10px;
         }
+    }
+}
+
+@-webkit-keyframes spin {
+    0% {
+        -webkit-transform: rotate(0deg);
+    }
+
+    100% {
+        -webkit-transform: rotate(360deg);
     }
 }
