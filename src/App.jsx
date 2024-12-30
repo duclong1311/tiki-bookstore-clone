@@ -82,14 +82,7 @@ export default function App() {
         {
           index: true, element:
             <PrivateRoute>
-              <AdminPage />
-            </PrivateRoute>,
-        },
-        {
-          path: "dashboard",
-          element:
-            <PrivateRoute>
-              <AdminPage />
+              <ManageUserPage />
             </PrivateRoute>,
         },
         {

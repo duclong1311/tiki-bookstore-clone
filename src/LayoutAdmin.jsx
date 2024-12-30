@@ -28,7 +28,7 @@ function getItem(label, key, icon, children) {
 }
 
 const items = [
-    getItem('Dash Board', 'dashboard', <PieChartOutlined />),
+    // getItem('Dash Board', 'dashboard', <PieChartOutlined />),
     getItem('Mange User', 'manage-user', <UserOutlined />, [
         getItem('CRUD User', 'user'),
     ]),
@@ -44,8 +44,8 @@ const LayoutAdmin = () => {
     const userInfor = useSelector(state => state.account.user);
 
     const [collapsed, setCollapsed] = useState(false);
-    const [activeMenu, setActiveMenu] = useState('dashboard');
-    const [pageUrl, setPageUrl] = useState('Dash Board');
+    const [activeMenu, setActiveMenu] = useState('CRUD User');
+    const [pageUrl, setPageUrl] = useState('User');
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const {
