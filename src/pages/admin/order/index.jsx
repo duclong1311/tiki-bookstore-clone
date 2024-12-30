@@ -39,6 +39,7 @@ const MangeOrderPage = () => {
                 }
                 {currentStep === 2 &&
                     <Result
+                        style={{ height: 'calc(100vh - 290px)' }}
                         icon={<SmileOutlined />}
                         title="Đơn hàng được đặt thành công!"
                         extra={<Button type="primary" onClick={() => navigate('/order-history')}>Xem lịch sử đặt hàng</Button>}

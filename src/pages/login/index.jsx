@@ -89,15 +89,14 @@ const LoginPage = () => {
                                     </Button>
                                 </Form.Item>
                                 <Divider style={{ color: 'lightgray' }}>HOẶC</Divider>
-                                <div className='login-3rd-party' style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                {/* <div className='login-3rd-party' style={{ display: 'flex', justifyContent: 'space-between' }}>
                                     <Button type="primary" icon={<FacebookOutlined />} size='large' onClick={() => handleLogin3rdParty('facebook')}>
                                         Facebook
                                     </Button>
                                     <Button type="primary" icon={<GoogleOutlined />} size='large' style={{ width: '123.28px' }} onClick={() => handleLogin3rdParty('google')}>
                                         Google
                                     </Button>
-                                </div>
-                                <br />
+                                </div> */}
                                 <p className="text text-normal">Chưa có tài khoản ?
                                     <span>
                                         <Link to='/register' > Đăng Ký </Link>

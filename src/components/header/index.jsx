@@ -52,7 +52,7 @@ const Header = (props) => {
             disabled: userInfo?.role === 'USER' ? true : false,
         },
         {
-            label: <Link to="/history">Lịch sử mua hàng</Link>,
+            label: <Link to="/order-history">Lịch sử mua hàng</Link>,
             key: 'history',
         },
         {
