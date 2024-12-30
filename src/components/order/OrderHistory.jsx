@@ -1,7 +1,6 @@
 import { Badge, Descriptions, Divider, Space, Table, Tag } from "antd";
 import { Children, useEffect, useState } from "react";
 import { getOrderHistory } from "../../services/api";
-import ReactJson from 'react-json-view'
 import { formatDate } from "../../services/formatDate";
 import './OrderHistory.scss';
 
