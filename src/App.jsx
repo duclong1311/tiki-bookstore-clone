@@ -82,8 +82,15 @@ export default function App() {
         {
           index: true, element:
             <PrivateRoute>
-              <ManageUserPage />
+              <AdminPage />
             </PrivateRoute>,
+        },
+        {
+          path: "dashboard",
+          element:
+            <PrivateRoute>
+              <AdminPage />
+            </PrivateRoute>
         },
         {
           path: "user",
@@ -91,7 +98,6 @@ export default function App() {
             <PrivateRoute>
               <ManageUserPage />
             </PrivateRoute>
-          ,
         },
         {
           path: "book",
