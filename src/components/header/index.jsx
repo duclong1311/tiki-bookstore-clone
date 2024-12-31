@@ -43,8 +43,6 @@ const Header = (props) => {
         }
     }
 
-    console.log(userInfo);
-
     let items = [
         {
             key: 'adminPage',

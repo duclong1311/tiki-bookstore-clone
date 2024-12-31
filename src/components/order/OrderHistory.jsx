@@ -21,8 +21,6 @@ const OrderHistory = () => {
         fetchHistory();
     }, []);
 
-    console.log(orderHistory);
-
     const columns = [
         {
             title: 'STT',
